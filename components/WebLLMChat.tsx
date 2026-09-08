@@ -70,8 +70,11 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
                 { role: "system", content: systemPrompt },
                 { role: "assistant", content: `Merhaba! ${data.meta.name} deposu için model başarıyla yüklendi. Sorularınızı sorabilirsiniz.` }
             ]);
-        } catch (e) {
-            console.error(e);
+        } catch (e: any) {
+            // Next.js dev overlay intercepts console.error. 
+            // We use console.warn to elegantly fallback without locking the UI.
+            console.warn("WebLLM başlatılamadı (Desteklenmeyen Donanım/WebGPU Kapalı).", e?.message);
+            setSupported(false);
             setProgress({ text: "Model yüklenemedi. Tarayıcınızı güncelleyin veya donanım ivmesini açın.", step: -1 });
         } finally {
             setLoading(false);
