@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { X, Check, Copy, Shield, Code, Link2 } from "lucide-react";
 
 interface BadgeModalProps {
@@ -23,8 +24,10 @@ export default function BadgeModal({ isOpen, onClose, owner, repo }: BadgeModalP
     const [format, setFormat] = useState<FormatType>("markdown");
     const [copied, setCopied] = useState(false);
     const [origin, setOrigin] = useState("");
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        setMounted(true);
         if (typeof window !== "undefined") {
             setOrigin(window.location.origin);
         }
@@ -44,7 +47,7 @@ export default function BadgeModal({ isOpen, onClose, owner, repo }: BadgeModalP
         };
     }, [isOpen, onClose]);
 
-    if (!isOpen) return null;
+    if (!isOpen || !mounted) return null;
 
     const badgeUrl = `${origin}/api/badge/${owner}/${repo}?metric=${metric}`;
     const targetUrl = `${origin}/?url=https://github.com/${owner}/${repo}`;
@@ -68,7 +71,7 @@ export default function BadgeModal({ isOpen, onClose, owner, repo }: BadgeModalP
         }
     };
 
-    return (
+    return createPortal(
         <div role="dialog" aria-modal="true" aria-labelledby="modal-title" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-150">
             <div
                 className="w-full max-w-lg bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl p-6 space-y-6 relative max-h-[90vh] overflow-y-auto no-scrollbar"
@@ -107,8 +110,8 @@ export default function BadgeModal({ isOpen, onClose, owner, repo }: BadgeModalP
                                 key={m}
                                 onClick={() => setMetric(m)}
                                 className={`py-2 px-3 text-xs font-medium rounded-lg border transition ${metric === m
-                                        ? "bg-indigo-600/10 border-indigo-500 text-indigo-300"
-                                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-700"
+                                    ? "bg-indigo-600/10 border-indigo-500 text-indigo-300"
+                                    : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-700"
                                     }`}
                             >
                                 {METRIC_LABELS[m]}
@@ -159,6 +162,7 @@ export default function BadgeModal({ isOpen, onClose, owner, repo }: BadgeModalP
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
