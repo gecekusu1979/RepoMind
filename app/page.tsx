@@ -24,7 +24,7 @@ import dynamic from "next/dynamic";
 const ArchitectureFlow = dynamic(() => import("@/components/ArchitectureFlow").then(m => m.ArchitectureFlow), { ssr: false });
 const WebLLMChat = dynamic(() => import("@/components/WebLLMChat").then(m => m.WebLLMChat), { ssr: false });
 
-type AppState = 
+type AppState =
   | { status: 'idle' }
   | { status: 'loading' }
   | { status: 'rate-limited'; error: string }
@@ -57,9 +57,9 @@ export default function Home() {
       setCached(result.meta.fullName, result);
     } catch (e: any) {
       if (e.message?.includes("403") || e.message?.includes("API rate limit")) {
-          setState({ status: "rate-limited", error: e.message });
+        setState({ status: "rate-limited", error: e.message });
       } else {
-          setState({ status: "error", error: e instanceof Error ? e.message : "Beklenmedik bir hata oluştu." });
+        setState({ status: "error", error: e instanceof Error ? e.message : "Beklenmedik bir hata oluştu." });
       }
     }
   }, []);
@@ -184,7 +184,7 @@ export default function Home() {
             </div>
           </div>
         )}
-        
+
         {state.status === "error" && (
           <div className="max-w-2xl mx-auto pb-16">
             <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400">
@@ -269,8 +269,8 @@ export default function Home() {
               </div>
 
               {/* Right: Scores + Security */}
-              <div className="space-y-4">
-                <div className="p-5 bg-white/[0.03] border border-white/10 rounded-2xl h-fit lg:sticky lg:top-6">
+              <div className="space-y-4 lg:sticky lg:top-6 self-start lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto no-scrollbar pb-8">
+                <div className="p-5 bg-white/[0.03] border border-white/10 rounded-2xl h-fit">
                   <ScorePanel
                     testScore={state.data.analysis.metrics.testScore}
                     docScore={state.data.analysis.metrics.docScore}
@@ -280,7 +280,7 @@ export default function Home() {
                 </div>
 
                 {/* Security scan card */}
-                <div className="lg:sticky lg:top-[calc(6rem+var(--score-panel-height,340px))] space-y-4">
+                <div className="space-y-4 pt-1">
                   <PackageAuditCard audit={state.data.analysis.packageAudit} />
                   <SecurityCard security={state.data.analysis.security} />
                 </div>
