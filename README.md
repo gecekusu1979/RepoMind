@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🧠 RepoMind
 
-## Getting Started
+> **Zero-Config, In-Browser GitHub Repository Analyzer & Architecture Radar**
 
-First, run the development server:
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Next.js](https://img.shields.io/badge/Next.js-16_App_Router-black?logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Strict_5.x-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![WebGPU](https://img.shields.io/badge/Local_AI-WebGPU_SmolLM2-emerald)](https://webllm.mlc.ai/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/your-username/repomind/pulls)
+
+**RepoMind**, herhangi bir açık kaynak GitHub deposunun mimarisini, kod sağlığını, bağımlılık risklerini ve sürdürülebilirliğini **depoyu yerel makinenize klonlamadan** saniyeler içinde analiz eden modern bir geliştirici aracıdır.
+
+Dışarıdan zorunlu bir LLM veya GitHub API anahtarına ihtiyaç duymaz; analizleri GitHub Tree API ve kural tabanlı algoritmalarla yerel olarak yürütür, yapay zekayı ise **WebGPU (WebLLM)** aracılığıyla doğrudan kullanıcının tarayıcısında çalıştırır.
+
+---
+
+## ⚡ Temel Özellikler
+
+* **Klonlamasız $O(N)$ Ağaç Taraması:** `git clone` maliyeti olmadan GitHub Git Trees API (`recursive=1`) üzerinden dosya hiyerarşisini tek bir istekte çözümler.
+* **Tarayıcı İçi Yerel AI (WebGPU):** `@mlc-ai/web-llm` ve `SmolLM2-135M` modeli ile tarayıcı sekmesinde çalışan, sıfır token maliyetli yerel repo asistanı.
+* **Otomatik Mimari Haritalandırma:** Frontend, Backend, Veritabanı ve DevOps katmanlarını dizin yapısından tespit eder ve interaktif **Mermaid v11** akış şemasına döker.
+* **Sağlık & Kalite Skorları:** Test kapsama oranı ($S_{\text{test}}$), dokümantasyon yeterliliği ($S_{\text{doc}}$) ve bakım puanı ($S_{\text{health}}$).
+* **Bus Factor & Sürdürülebilirlik:** En aktif 10 katkıcıyı analiz ederek projenin tek bir geliştiriciye bağımlılık riskini (SPOF) tespit eder.
+* **Güvenlik & Paket Denetimi:** `package.json` içerisindeki terk edilmiş paketleri (e.g., `moment`, `request`), şüpheli `postinstall` betiklerini ve virütik lisansları (GPL/AGPL) bayraklar.
+* **Good First Issues Radarı:** Yeni katkıcılar için repodaki başlangıç seviyesi görevleri PR'lardan ayıklayarak listeler.
+* **Dinamik SVG Rozetleri:** `README.md` dosyalarına doğrudan eklenebilen Shield tarzı canlı sağlık rozetleri üretir.
+* **Manifest V3 Chrome Eklentisi:** `github.com` üzerinde gezinirken repo başlığına tek tıkla analiz başlatan güvenli bir buton ekler.
+
+---
+
+## 🛠️ Teknoloji Yığını
+
+* **Çatı:** [Next.js 16](https://nextjs.org) (App Router, React Server Components)
+* **Dil:** TypeScript (Strict Mode)
+* **Arayüz:** Tailwind CSS, Lucide Icons, Recharts, Mermaid.js
+* **İstemci Yapay Zekası:** [@mlc-ai/web-llm](https://webllm.mlc.ai/) (SmolLM2 quantized via WebGPU)
+* **Güvenlik:** `rehype-sanitize`, `isValidGitHubSlug` traversal & SSRF korumaları
+
+---
+
+## 🚀 Hızlı Başlangıç
+
+RepoMind **%100 anahtarsız (zero-key)** çalışacak şekilde tasarlanmıştır.
 
 ```bash
+# 1. Depoyu klonlayın
+git clone https://github.com/your-username/repomind.git
+cd repomind
+
+# 2. Bağımlılıkları yükleyin
+npm install
+
+# 3. Geliştirme sunucusunu başlatın
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Tarayıcınızda `http://localhost:3000` adresini açarak dilediğiniz depoyu analiz etmeye başlayabilirsiniz.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+> **Not (Opsiyonel GitHub Token):** Anonim isteklerde GitHub saatlik 60 istek sınırı uygular. Bu limiti saatte 5.000 isteğe çıkarmak isterseniz `.env.local` dosyasına kişisel tokenınızı ekleyebilirsiniz:
+>
+> ```env
+> GITHUB_TOKEN=ghp_your_personal_access_token_here
+> ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🛡️ Dinamik README Rozeti (Badge API)
 
-To learn more about Next.js, take a look at the following resources:
+Deponuzun canlı sağlık skorunu projenizin kendi `README.md` dosyasına eklemek için:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```markdown
+[![RepoMind Health](https://repomind.dev/api/badge/owner/repo?metric=health)](https://repomind.dev/?url=https://github.com/owner/repo)
+```
+Desteklenen metrikler: `metric=health`, `metric=test`, `metric=doc`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 📄 Lisans
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Bu proje **GNU General Public License v3.0 (GPL-3.0)** altında lisanslanmıştır. Daha fazla bilgi için `LICENSE` dosyasına bakabilirsiniz.

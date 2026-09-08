@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>RepoMind Ayarlar</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    body {
+      width: 320px;
+      background: #09090b;
+      color: #fafafa;
+      padding: 16px;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #27272a;
+    }
+    .logo {
+      font-size: 18px;
+    }
+    .title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #f4f4f5;
+    }
+    .label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #a1a1aa;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .radio-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .radio-card:hover {
+      border-color: #3f3f46;
+    }
+    .radio-card.active {
+      border-color: #6366f1;
+      background: rgba(99, 102, 241, 0.08);
+    }
+    .radio-card input {
+      accent-color: #6366f1;
+      cursor: pointer;
+    }
+    .custom-input {
+      width: 100%;
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 8px;
+      padding: 8px 10px;
+      color: #f4f4f5;
+      font-size: 12px;
+      outline: none;
+      margin-top: 6px;
+      transition: border-color 0.2s;
+    }
+    .custom-input:focus {
+      border-color: #6366f1;
+    }
+    .hidden {
+      display: none;
+    }
+    .btn-save {
+      width: 100%;
+      margin-top: 14px;
+      background: #4f46e5;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      padding: 9px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-save:hover {
+      background: #4338ca;
+    }
+    .status {
+      font-size: 11px;
+      text-align: center;
+      margin-top: 8px;
+      min-height: 14px;
+      color: #34d399;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <span class="logo">🧠</span>
+    <span class="title">RepoMind Hedef Sunucu</span>
+  </div>
+
+  <span class="label">Analiz Ortamı</span>
+  <div class="radio-group">
+    <label class="radio-card" id="card-local">
+      <input type="radio" name="target" value="local" id="radio-local">
+      <span>Yerel (http://localhost:3000)</span>
+    </label>
+    <label class="radio-card" id="card-prod">
+      <input type="radio" name="target" value="prod" id="radio-prod">
+      <span>Canlı Web (repomind.dev)</span>
+    </label>
+    <label class="radio-card" id="card-custom">
+      <input type="radio" name="target" value="custom" id="radio-custom">
+      <span>Özel Alan Adı</span>
+    </label>
+  </div>
+
+  <div id="custom-wrapper" class="hidden">
+    <span class="label">Özel URL</span>
+    <input type="text" id="custom-url" class="custom-input" placeholder="https://app.alanadiniz.com">
+  </div>
+
+  <button id="btn-save" class="btn-save">Kaydet</button>
+  <div id="status" class="status"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
