@@ -29,8 +29,8 @@ RepoMind çekirdeği aşağıdaki AppSec standartlarına göre sertleştirilmiş
 Bir güvenlik açığı veya zafiyet tespit ettiyseniz lütfen bunu **herkese açık bir GitHub Issue olarak bildirmeyin**.
 
 Bunun yerine sorumlu açıklama (responsible disclosure) ilkelerine uygun olarak:
-* **E-posta:** `security@yourdomain.com` (veya GitHub Profil E-postanız)
-* **GitHub Security Advisory:** Deponun **Security** sekmesi altındaki *"Report a vulnerability"* butonunu kullanarak özel bir bildirim oluşturun.
+* **GitHub Security Advisory:** Deponun [gecekusu1979/RepoMind](https://github.com/gecekusu1979/RepoMind/security) **Security** sekmesi altındaki *"Report a vulnerability"* butonunu kullanarak özel bir güvenlik bildirimi (Private Vulnerability Report) oluşturun.
+* (Alternatif) Varsa GitHub profilimde yer alan herkese açık e-posta adresimden bana ulaşabilirsiniz.
 
 ### Raporunuzda Lütfen Şunları Belirtin:
 * Zafiyetin türü ve etkilenen bileşen/dosya yolu.

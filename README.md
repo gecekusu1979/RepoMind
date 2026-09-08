@@ -6,7 +6,7 @@
 [![Next.js](https://img.shields.io/badge/Next.js-16_App_Router-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Strict_5.x-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![WebGPU](https://img.shields.io/badge/Local_AI-WebGPU_SmolLM2-emerald)](https://webllm.mlc.ai/)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/your-username/repomind/pulls)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/gecekusu1979/RepoMind/pulls)
 
 **RepoMind**, herhangi bir açık kaynak GitHub deposunun mimarisini, kod sağlığını, bağımlılık risklerini ve sürdürülebilirliğini **depoyu yerel makinenize klonlamadan** saniyeler içinde analiz eden modern bir geliştirici aracıdır.
 
@@ -44,8 +44,8 @@ RepoMind **%100 anahtarsız (zero-key)** çalışacak şekilde tasarlanmıştır
 
 ```bash
 # 1. Depoyu klonlayın
-git clone https://github.com/your-username/repomind.git
-cd repomind
+git clone https://github.com/gecekusu1979/RepoMind.git
+cd RepoMind
 
 # 2. Bağımlılıkları yükleyin
 npm install
@@ -59,7 +59,7 @@ Tarayıcınızda `http://localhost:3000` adresini açarak dilediğiniz depoyu an
 > **Not (Opsiyonel GitHub Token):** Anonim isteklerde GitHub saatlik 60 istek sınırı uygular. Bu limiti saatte 5.000 isteğe çıkarmak isterseniz `.env.local` dosyasına kişisel tokenınızı ekleyebilirsiniz:
 >
 > ```env
-> GITHUB_TOKEN=ghp_your_personal_access_token_here
+> GITHUB_TOKEN=ghp_kisisel_erisim_tokeniniz_buraya
 > ```
 
 ---
