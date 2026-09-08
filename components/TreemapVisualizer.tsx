@@ -6,8 +6,8 @@ import {
     ResponsiveContainer,
     Tooltip,
 } from "recharts";
-import { FileTreeItem, TreemapNode } from "@/types/repo";
-import { buildTreemap, flattenForRecharts, formatBytes, CATEGORY_COLORS, getFileCategory } from "@/lib/treemap";
+import { FileTreeItem } from "@/types/repo";
+import { TreemapNode, buildTreemap, flattenForRecharts, formatBytes, CATEGORY_COLORS, getFileCategory } from "@/lib/treemap";
 
 interface TreemapVisualizerProps {
     files: FileTreeItem[];
@@ -130,10 +130,10 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Toolti
 
 const LEGEND_ITEMS: { cat: keyof typeof CATEGORY_COLORS; label: string }[] = [
     { cat: "code", label: "Kod" },
-    { cat: "styling", label: "Stil / Markup" },
-    { cat: "assets", label: "Varlıklar" },
+    { cat: "markup", label: "Markup & CSS" },
+    { cat: "asset", label: "Varlıklar" },
     { cat: "config", label: "Config" },
-    { cat: "other", label: "Diğer" },
+    { cat: "aggregate", label: "Diğer (Küme)" },
 ];
 
 // ─── Main Component ──────────────────────────────────────────────────────
@@ -149,13 +149,13 @@ export const TreemapVisualizer = React.memo(function TreemapVisualizer({ files }
         () =>
             (flattenForRecharts(root, depth) as RechartsTreemapItem[]).map((node) => ({
                 ...node,
-                category: node.category ?? (node.children ? "other" : getFileCategory(node.path)),
+                category: node.category ?? (node.children ? "aggregate" : getFileCategory(node.name ?? "")),
                 root,
             })),
         [root, depth]
     );
 
-    const totalBytes = root.value;
+    const totalBytes = root.value ?? 0;
 
     if (flatData.length === 0) {
         return (
