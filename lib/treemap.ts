@@ -173,24 +173,44 @@ export function buildTreemap(files: FileTreeItem[]): TreemapNode {
     };
 }
 
-/** Filter tree to a maximum depth from root */
-export function filterByDepth(node: TreemapNode, maxDepth: number): TreemapNode {
-    if (!node.children || maxDepth <= 0) {
+/** Filter tree to a maximum depth from root, and truncate wide directories to prevent DOM explosion */
+export function filterByDepth(node: TreemapNode, maxDepth: number, maxSiblings = 20): TreemapNode {
+    if (!node.children || node.children.length === 0 || maxDepth <= 0) {
         return { ...node, children: undefined };
     }
+
+    let children = [...node.children].sort((a, b) => b.value - a.value);
+
+    // Hard ceiling on sibling rendering to avoid recharts SVG DOM OOM
+    if (children.length > maxSiblings) {
+        const topChildren = children.slice(0, maxSiblings);
+        const rest = children.slice(maxSiblings);
+        const restValue = rest.reduce((acc, c) => acc + c.value, 0);
+
+        if (restValue > 0) {
+            topChildren.push({
+                name: `+${rest.length} items`,
+                path: node.path ? `${node.path}/+other` : "+other",
+                value: restValue,
+                category: "other",
+                depth: (node.depth ?? 0) + 1,
+            });
+        }
+        children = topChildren;
+    }
+
     return {
         ...node,
-        children: node.children
-            .map((c) => filterByDepth(c, maxDepth - 1))
-            .sort((a, b) => b.value - a.value),
+        children: children.map((c) => filterByDepth(c, maxDepth - 1, maxSiblings)),
     };
 }
 
 /** Flatten tree to recharts-compatible format (leaf nodes only, or collapsed dirs) */
 export function flattenForRecharts(
     node: TreemapNode,
-    maxDepth: number
+    maxDepth: number,
+    maxSiblings = 20
 ): TreemapNode[] {
-    const filtered = filterByDepth(node, maxDepth);
+    const filtered = filterByDepth(node, maxDepth, maxSiblings);
     return filtered.children ?? [];
 }

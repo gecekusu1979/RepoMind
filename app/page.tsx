@@ -24,16 +24,19 @@ import dynamic from "next/dynamic";
 const ArchitectureFlow = dynamic(() => import("@/components/ArchitectureFlow").then(m => m.ArchitectureFlow), { ssr: false });
 const WebLLMChat = dynamic(() => import("@/components/WebLLMChat").then(m => m.WebLLMChat), { ssr: false });
 
+type AppState = 
+  | { status: 'idle' }
+  | { status: 'loading' }
+  | { status: 'rate-limited'; error: string }
+  | { status: 'error'; error: string }
+  | { status: 'success'; data: AnalyzeResponse };
+
 export default function Home() {
-  const [data, setData] = useState<AnalyzeResponse | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [state, setState] = useState<AppState>({ status: 'idle' });
   const [currentRepo, setCurrentRepo] = useState<string | undefined>();
 
   const runAnalysis = useCallback(async (url: string) => {
-    setLoading(true);
-    setError(null);
-    setData(null);
+    setState({ status: "loading" });
 
     try {
       const res = await fetch("/api/analyze", {
@@ -49,13 +52,15 @@ export default function Home() {
       }
 
       const result = json as AnalyzeResponse;
-      setData(result);
+      setState({ status: "success", data: result });
       setCurrentRepo(result.meta.fullName);
       setCached(result.meta.fullName, result);
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Beklenmedik bir hata oluştu.");
-    } finally {
-      setLoading(false);
+    } catch (e: any) {
+      if (e.message?.includes("403") || e.message?.includes("API rate limit")) {
+          setState({ status: "rate-limited", error: e.message });
+      } else {
+          setState({ status: "error", error: e instanceof Error ? e.message : "Beklenmedik bir hata oluştu." });
+      }
     }
   }, []);
 
@@ -68,10 +73,8 @@ export default function Home() {
       const fullName = `${match[1]}/${match[2]}`;
       const cached = getCached(fullName);
       if (cached) {
-        setData(cached);
+        setState({ status: "success", data: cached });
         setCurrentRepo(fullName);
-        setError(null);
-        setLoading(false);
         return;
       }
     }
@@ -81,9 +84,8 @@ export default function Home() {
   const handleRecentSelect = useCallback((fullName: string) => {
     const cached = getCached(fullName);
     if (cached) {
-      setData(cached);
+      setState({ status: "success", data: cached });
       setCurrentRepo(fullName);
-      setError(null);
     } else {
       runAnalysis(`https://github.com/${fullName}`);
     }
@@ -145,13 +147,13 @@ export default function Home() {
 
           {/* Input */}
           <div className="max-w-2xl mx-auto space-y-3">
-            <RepoInput onAnalyze={handleAnalyze} isLoading={loading} />
+            <RepoInput onAnalyze={handleAnalyze} isLoading={state.status === "loading"} />
             <RecentRepos onSelect={handleRecentSelect} currentRepo={currentRepo} />
           </div>
         </section>
 
         {/* Loading Skeleton */}
-        {loading && (
+        {state.status === "loading" && (
           <div className="space-y-4 pb-16 animate-in fade-in duration-300">
             <SkeletonBlock className="h-36 rounded-2xl" />
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-4">
@@ -164,34 +166,53 @@ export default function Home() {
         )}
 
         {/* Error */}
-        {error && !loading && (
+        {state.status === "rate-limited" && (
+          <div className="max-w-2xl mx-auto pb-16 animate-in fade-in">
+            <div className="flex items-start gap-4 p-5 bg-amber-500/10 border border-amber-500/20 rounded-2xl">
+              <AlertCircle className="w-6 h-6 text-amber-500 mt-0.5 flex-shrink-0" />
+              <div className="space-y-3">
+                <div>
+                  <h3 className="text-sm font-bold text-amber-500">GitHub API Limiti Aşıldı</h3>
+                  <p className="text-sm text-amber-500/80 mt-1">
+                    Saatlik 60 istek sınırına ulaştınız. Analize devam etmek için bir GitHub Token ekleyebilirsiniz.
+                  </p>
+                </div>
+                <div className="p-3 bg-black/20 rounded-xl text-xs font-mono text-amber-200/70">
+                  {state.error}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {state.status === "error" && (
           <div className="max-w-2xl mx-auto pb-16">
             <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400">
               <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
               <div className="space-y-1">
                 <p className="font-medium text-sm">Analiz başarısız</p>
-                <p className="text-sm text-red-400/70">{error}</p>
+                <p className="text-sm text-red-400/70">{state.error}</p>
               </div>
             </div>
           </div>
         )}
 
         {/* Dashboard */}
-        {data && !loading && (
+        {state.status === "success" && (
           <section className="pb-16 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Header Card */}
             <div className="p-5 md:p-6 bg-white/[0.03] border border-white/10 rounded-2xl">
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div className="flex-1 min-w-0">
                   <RepoHeader
-                    meta={data.meta}
-                    totalFiles={data.analysis.totalFiles}
-                    truncated={data.analysis.truncated}
-                    activity={data.analysis.activity}
+                    meta={state.data.meta}
+                    totalFiles={state.data.analysis.totalFiles}
+                    truncated={state.data.analysis.truncated}
+                    activity={state.data.analysis.activity}
                   />
                 </div>
                 {/* Export buttons */}
-                <ExportReport data={data} />
+                <ExportReport data={state.data} />
               </div>
             </div>
 
@@ -200,20 +221,20 @@ export default function Home() {
               {/* Left: Architecture + Language + Treemap + Dependencies */}
               <div className="space-y-4">
                 <div className="p-5 bg-white/[0.03] border border-white/10 rounded-2xl">
-                  <ArchitectureTree buckets={data.analysis.architecture} />
+                  <ArchitectureTree buckets={state.data.analysis.architecture} />
                 </div>
 
-                <ArchitectureFlow buckets={data.analysis.architecture} />
+                <ArchitectureFlow buckets={state.data.analysis.architecture} />
 
-                {data.analysis.topLanguages.length > 0 && (
+                {state.data.analysis.topLanguages.length > 0 && (
                   <div className="p-5 bg-white/[0.03] border border-white/10 rounded-2xl">
-                    <LanguageBar languages={data.analysis.topLanguages} />
+                    <LanguageBar languages={state.data.analysis.topLanguages} />
                   </div>
                 )}
 
                 {/* Treemap Visualizer */}
                 <div className="p-5 bg-white/[0.03] border border-white/10 rounded-2xl">
-                  <TreemapVisualizer files={data.analysis.architecture.flatMap((b) =>
+                  <TreemapVisualizer files={state.data.analysis.architecture.flatMap((b) =>
                     b.paths.map((p) => ({
                       path: p,
                       type: "blob" as const,
@@ -223,13 +244,13 @@ export default function Home() {
                 </div>
 
                 {/* Dependencies */}
-                {data.analysis.dependencies.length > 0 && (
+                {state.data.analysis.dependencies.length > 0 && (
                   <div className="p-5 bg-white/[0.03] border border-white/10 rounded-2xl">
                     <h3 className="text-xs font-semibold text-white/30 uppercase tracking-widest mb-3">
-                      Bağımlılıklar ({data.analysis.dependencies.length})
+                      Bağımlılıklar ({state.data.analysis.dependencies.length})
                     </h3>
                     <div className="flex flex-wrap gap-1.5">
-                      {data.analysis.dependencies.slice(0, 30).map((dep) => (
+                      {state.data.analysis.dependencies.slice(0, 30).map((dep) => (
                         <span
                           key={dep}
                           className="px-2 py-0.5 bg-white/5 border border-white/10 rounded-md text-xs font-mono text-white/50"
@@ -237,9 +258,9 @@ export default function Home() {
                           {dep}
                         </span>
                       ))}
-                      {data.analysis.dependencies.length > 30 && (
+                      {state.data.analysis.dependencies.length > 30 && (
                         <span className="px-2 py-0.5 text-xs text-white/30">
-                          +{data.analysis.dependencies.length - 30} daha
+                          +{state.data.analysis.dependencies.length - 30} daha
                         </span>
                       )}
                     </div>
@@ -251,17 +272,17 @@ export default function Home() {
               <div className="space-y-4">
                 <div className="p-5 bg-white/[0.03] border border-white/10 rounded-2xl h-fit lg:sticky lg:top-6">
                   <ScorePanel
-                    testScore={data.analysis.metrics.testScore}
-                    docScore={data.analysis.metrics.docScore}
-                    healthScore={data.analysis.metrics.healthScore}
-                    overall={data.analysis.metrics.overall}
+                    testScore={state.data.analysis.metrics.testScore}
+                    docScore={state.data.analysis.metrics.docScore}
+                    healthScore={state.data.analysis.metrics.healthScore}
+                    overall={state.data.analysis.metrics.overall}
                   />
                 </div>
 
                 {/* Security scan card */}
                 <div className="lg:sticky lg:top-[calc(6rem+var(--score-panel-height,340px))] space-y-4">
-                  <PackageAuditCard audit={data.analysis.packageAudit} />
-                  <SecurityCard security={data.analysis.security} />
+                  <PackageAuditCard audit={state.data.analysis.packageAudit} />
+                  <SecurityCard security={state.data.analysis.security} />
                 </div>
 
                 {/* Badge URL card */}
@@ -271,7 +292,7 @@ export default function Home() {
                   </h3>
                   <div className="space-y-1.5">
                     {(["health", "test", "doc"] as const).map((metric) => {
-                      const badgeUrl = `/api/badge/${data.meta.owner}/${data.meta.name}?metric=${metric}`;
+                      const badgeUrl = `/api/badge/${state.data.meta.owner}/${state.data.meta.name}?metric=${metric}`;
                       return (
                         <a
                           key={metric}
@@ -281,7 +302,7 @@ export default function Home() {
                           className="flex items-center gap-2 group"
                         >
                           <code className="text-[10px] font-mono text-white/30 group-hover:text-white/60 bg-white/5 px-2 py-1 rounded-lg truncate w-full transition-colors">
-                            /api/badge/{data.meta.owner}/{data.meta.name}?metric={metric}
+                            /api/badge/{state.data.meta.owner}/{state.data.meta.name}?metric={metric}
                           </code>
                         </a>
                       );
@@ -293,26 +314,26 @@ export default function Home() {
 
             {/* Full Width Dynamic Row: Bus Factor & Good First Issues */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <BusFactorCard meta={data.meta} />
-              <GoodFirstIssues meta={data.meta} />
+              <BusFactorCard meta={state.data.meta} />
+              <GoodFirstIssues meta={state.data.meta} />
             </div>
 
             {/* Badges */}
             <div className="p-5 md:p-6 bg-white/[0.03] border border-white/10 rounded-2xl">
               <BadgeList
-                goodPractices={data.analysis.goodPractices}
-                potentialProblems={data.analysis.potentialProblems}
+                goodPractices={state.data.analysis.goodPractices}
+                potentialProblems={state.data.analysis.potentialProblems}
               />
             </div>
 
             {/* AI Explain & WebLLM Chat */}
-            <ExplainDrawer data={data} />
-            <WebLLMChat data={data} />
+            <ExplainDrawer data={state.data} />
+            <WebLLMChat data={state.data} />
           </section>
         )}
 
         {/* Footer */}
-        {!data && !loading && !error && (
+        {state.status === "idle" && (
           <footer className="pb-16 text-center text-white/20 text-xs space-y-3">
             <p className="flex items-center justify-center gap-1.5 opacity-60">
               RepoMind Chrome Eklentisini yükleyerek GitHub üzerinde tek tıkla analiz başlatabilirsiniz.

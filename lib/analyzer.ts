@@ -10,24 +10,14 @@ import { checkActivity } from "@/lib/activityChecker";
 import { auditPackages } from "@/lib/packageAudit";
 
 // ───────────────────────────────────────────────────────────────
-// Pattern Maps
+// O(1) Set Lookups for Fast Hierarchy Resolution (Replaces Regex)
 // ───────────────────────────────────────────────────────────────
-const ARCH_PATTERNS: Record<
-    ArchitectureBucket["name"],
-    RegExp
-> = {
-    Frontend: /^(src|app|pages|components|views|ui|client|frontend|web)\//i,
-    Backend:
-        /^(api|controllers|services|routes|server|handlers|middleware|backend)\//i,
-    Database:
-        /^(prisma|drizzle|migrations|models|schemas|sql|db|database|seeds)\//i,
-    "Infra/DevOps":
-        /^(\.github|docker|k8s|kubernetes|terraform|deploy|infra|\.aws|ci|ansible|helm)\//i,
-    Tests: /^(__tests__|tests?|spec|e2e|cypress|playwright)\//i,
-    Config:
-        /^(config|configs|settings|\.vscode|\.husky|scripts|tools|build|dist|\.next)\//i,
-    Other: /.*/,
-};
+const FRONTEND_DIRS = new Set(["src", "app", "pages", "components", "views", "ui", "client", "frontend", "web"]);
+const BACKEND_DIRS = new Set(["api", "controllers", "services", "routes", "server", "handlers", "middleware", "backend"]);
+const DB_DIRS = new Set(["prisma", "drizzle", "migrations", "models", "schemas", "sql", "db", "database", "seeds"]);
+const INFRA_DIRS = new Set([".github", "docker", "k8s", "kubernetes", "terraform", "deploy", "infra", ".aws", "ci", "ansible", "helm"]);
+const TEST_DIRS = new Set(["__tests__", "tests", "test", "spec", "e2e", "cypress", "playwright"]);
+const CONFIG_DIRS = new Set(["config", "configs", "settings", ".vscode", ".husky", "scripts", "tools", "build", "dist", ".next"]);
 
 const ARCH_COLORS: Record<ArchitectureBucket["name"], string> = {
     Frontend: "#6366f1",
@@ -49,9 +39,8 @@ const ARCH_ICONS: Record<ArchitectureBucket["name"], string> = {
     Other: "📁",
 };
 
-const TEST_PATTERNS = /\.(test|spec)\.[jt]sx?$|__tests__\//;
-const EXECUTABLE_EXTENSIONS = /\.[jt]sx?$|\.py$|\.rb$|\.go$|\.rs$|\.java$|\.cs$|\.php$|\.swift$|\.kt$/;
-const DOC_INLINE_PATTERNS = /\.(md|mdx|rst|txt)$/i;
+const EXECUTABLE_EXTS = new Set(["js", "ts", "jsx", "tsx", "py", "go", "rs", "java", "c", "cpp", "cs", "php", "rb", "swift", "kt"]);
+const DOC_EXTS = new Set(["md", "mdx", "rst", "txt"]);
 
 // ───────────────────────────────────────────────────────────────
 // Architecture Detection
@@ -60,38 +49,31 @@ function detectArchitecture(
     files: FileTreeItem[]
 ): ArchitectureBucket[] {
     const buckets: Record<ArchitectureBucket["name"], string[]> = {
-        Frontend: [],
-        Backend: [],
-        Database: [],
-        "Infra/DevOps": [],
-        Tests: [],
-        Config: [],
-        Other: [],
+        Frontend: [], Backend: [], Database: [], "Infra/DevOps": [],
+        Tests: [], Config: [], Other: [],
     };
 
     const order: ArchitectureBucket["name"][] = [
-        "Frontend",
-        "Backend",
-        "Database",
-        "Infra/DevOps",
-        "Tests",
-        "Config",
-        "Other",
+        "Frontend", "Backend", "Database", "Infra/DevOps", "Tests", "Config", "Other",
     ];
 
     for (const file of files) {
         if (file.type !== "blob") continue;
-        let matched = false;
-        for (const name of order.slice(0, -1)) {
-            if (ARCH_PATTERNS[name].test(file.path)) {
-                buckets[name].push(file.path);
-                matched = true;
-                break;
-            }
+
+        let bucketName: ArchitectureBucket["name"] = "Other";
+        const parts = file.path.toLowerCase().split("/");
+
+        if (parts.length > 1) {
+            const rootDir = parts[0];
+            if (FRONTEND_DIRS.has(rootDir)) bucketName = "Frontend";
+            else if (BACKEND_DIRS.has(rootDir)) bucketName = "Backend";
+            else if (DB_DIRS.has(rootDir)) bucketName = "Database";
+            else if (INFRA_DIRS.has(rootDir)) bucketName = "Infra/DevOps";
+            else if (TEST_DIRS.has(rootDir)) bucketName = "Tests";
+            else if (CONFIG_DIRS.has(rootDir)) bucketName = "Config";
         }
-        if (!matched) {
-            buckets["Other"].push(file.path);
-        }
+
+        buckets[bucketName].push(file.path);
     }
 
     return order
@@ -110,12 +92,26 @@ function detectArchitecture(
 // Test Score
 // ───────────────────────────────────────────────────────────────
 function calcTestScore(files: FileTreeItem[]): number {
-    const blobs = files.filter((f) => f.type === "blob");
-    const execFiles = blobs.filter((f) => EXECUTABLE_EXTENSIONS.test(f.path));
-    const testFiles = blobs.filter((f) => TEST_PATTERNS.test(f.path));
+    let execCount = 0;
+    let testCount = 0;
 
-    if (execFiles.length === 0) return 0;
-    const rawRatio = testFiles.length / execFiles.length;
+    for (const f of files) {
+        if (f.type !== "blob") continue;
+        const lowerPath = f.path.toLowerCase();
+
+        const isTest = lowerPath.includes(".test.") || lowerPath.includes(".spec.") || lowerPath.includes("__tests__/");
+        if (isTest) {
+            testCount++;
+        }
+
+        const ext = lowerPath.split(".").pop();
+        if (ext && EXECUTABLE_EXTS.has(ext)) {
+            execCount++;
+        }
+    }
+
+    if (execCount === 0) return 0;
+    const rawRatio = testCount / execCount;
     // 10% test ratio = 60 score, 30% = 100
     return Math.min(100, Math.round((rawRatio / 0.3) * 100));
 }
@@ -146,9 +142,15 @@ function calcDocScore(
         score += 15;
 
     // Inline docs (10 pts)
-    const docFiles = files.filter((f) => DOC_INLINE_PATTERNS.test(f.path) && f.path !== "README.md");
-    if (docFiles.length >= 3) score += 10;
-    else if (docFiles.length >= 1) score += 5;
+    let docCount = 0;
+    for (const p of paths) {
+        if (p === "readme.md") continue;
+        const ext = p.split(".").pop();
+        if (ext && DOC_EXTS.has(ext)) docCount++;
+    }
+
+    if (docCount >= 3) score += 10;
+    else if (docCount >= 1) score += 5;
 
     // Changelog (10 pts)
     if (paths.some((p) => p.includes("changelog") || p.includes("history.md")))
@@ -247,8 +249,15 @@ function detectGoodPractices(files: FileTreeItem[]): string[] {
     )
         practices.push("✅ Open-source license included");
 
-    if (files.some((f) => TEST_PATTERNS.test(f.path)))
-        practices.push("✅ Test suite detected");
+    let hasTests = false;
+    for (const f of files) {
+        const lp = f.path.toLowerCase();
+        if (lp.includes(".test.") || lp.includes(".spec.") || lp.includes("__tests__/")) {
+            hasTests = true;
+            break;
+        }
+    }
+    if (hasTests) practices.push("✅ Test suite detected");
 
     const linterPatterns = [
         ".eslintrc",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import {
     Treemap,
     ResponsiveContainer,
@@ -138,7 +138,7 @@ const LEGEND_ITEMS: { cat: keyof typeof CATEGORY_COLORS; label: string }[] = [
 
 // ─── Main Component ──────────────────────────────────────────────────────
 
-export function TreemapVisualizer({ files }: TreemapVisualizerProps) {
+export const TreemapVisualizer = React.memo(function TreemapVisualizer({ files }: TreemapVisualizerProps) {
     const [depth, setDepth] = useState<Depth>(2);
 
     const root = useMemo(() => buildTreemap(files.filter((f) => f.type === "blob" && (f.size ?? 0) > 0)), [files]);
@@ -224,3 +224,4 @@ export function TreemapVisualizer({ files }: TreemapVisualizerProps) {
         </div>
     );
 }
+);

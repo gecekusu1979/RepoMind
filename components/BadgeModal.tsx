@@ -69,15 +69,17 @@ export default function BadgeModal({ isOpen, onClose, owner, repo }: BadgeModalP
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-150">
+        <div role="dialog" aria-modal="true" aria-labelledby="modal-title" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-150">
             <div
                 className="w-full max-w-lg bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl p-6 space-y-6 relative"
                 onClick={(e) => e.stopPropagation()}
+                tabIndex={-1}
+                autoFocus
             >
                 <div className="flex items-center justify-between pb-4 border-b border-zinc-800">
                     <div className="flex items-center gap-2">
                         <Shield className="w-5 h-5 text-indigo-400" />
-                        <h3 className="text-base font-bold text-zinc-100">README Rozeti Al</h3>
+                        <h3 id="modal-title" className="text-base font-bold text-zinc-100">README Rozeti Al</h3>
                     </div>
                     <button
                         onClick={onClose}
