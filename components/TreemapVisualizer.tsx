@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useMemo } from "react";
 import {
@@ -6,16 +6,19 @@ import {
     ResponsiveContainer,
     Tooltip,
 } from "recharts";
-import { FileTreeItem } from "@/types/repo";
+import { FileTreeItem, ArchitectureBucket } from "@/types/repo";
 import { TreemapNode, buildTreemap, flattenForRecharts, formatBytes, CATEGORY_COLORS, getFileCategory } from "@/lib/treemap";
+import { X, Filter } from "lucide-react";
 
 interface TreemapVisualizerProps {
     files: FileTreeItem[];
+    selectedLayer?: string | null;
+    onClearFilter?: () => void;
+    buckets?: ArchitectureBucket[];
 }
 
 type Depth = 1 | 2 | 3 | 4;
 
-// ─── Custom Content Renderer ───────────────────────────────────────────────
 
 interface ContentProps {
     x?: number;
@@ -86,7 +89,6 @@ function CustomContent(props: ContentProps) {
     );
 }
 
-// ─── Tooltip ──────────────────────────────────────────────────────────────
 
 interface TooltipPayload {
     payload?: {
@@ -126,7 +128,6 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Toolti
     );
 }
 
-// ─── Legend ──────────────────────────────────────────────────────────────
 
 const LEGEND_ITEMS: { cat: keyof typeof CATEGORY_COLORS; label: string }[] = [
     { cat: "code", label: "Kod" },
@@ -136,14 +137,36 @@ const LEGEND_ITEMS: { cat: keyof typeof CATEGORY_COLORS; label: string }[] = [
     { cat: "aggregate", label: "Diğer (Küme)" },
 ];
 
-// ─── Main Component ──────────────────────────────────────────────────────
 
-export const TreemapVisualizer = React.memo(function TreemapVisualizer({ files }: TreemapVisualizerProps) {
+export const TreemapVisualizer = React.memo(function TreemapVisualizer({
+    files,
+    selectedLayer,
+    onClearFilter,
+    buckets,
+}: TreemapVisualizerProps) {
     const [depth, setDepth] = useState<Depth>(2);
 
-    const root = useMemo(() => buildTreemap(files.filter((f) => f.type === "blob" && (f.size ?? 0) > 0)), [files]);
+    const filteredFiles = useMemo(() => {
+        if (!selectedLayer || !buckets) return files;
+        const activeBucket = buckets.find((b) => b.name === selectedLayer);
+        if (!activeBucket) return files;
 
-    // recharts Treemap requires an index-signature compatible type
+        const samplePaths = new Set(activeBucket.paths);
+        const prefixes = activeBucket.paths.map((p) => {
+            const parts = p.split("/");
+            return parts.length > 1 ? parts[0] : p;
+        });
+        const prefixSet = new Set(prefixes);
+
+        return files.filter((f) => {
+            if (samplePaths.has(f.path)) return true;
+            const topDir = f.path.split("/")[0];
+            return prefixSet.has(topDir);
+        });
+    }, [files, selectedLayer, buckets]);
+
+    const root = useMemo(() => buildTreemap(filteredFiles.filter((f) => f.type === "blob" && (f.size ?? 0) > 0)), [filteredFiles]);
+
     type RechartsTreemapItem = TreemapNode & Record<string, unknown>;
     const flatData: RechartsTreemapItem[] = useMemo(
         () =>
@@ -157,10 +180,20 @@ export const TreemapVisualizer = React.memo(function TreemapVisualizer({ files }
 
     const totalBytes = root.value ?? 0;
 
+    const filteredCount = filteredFiles.filter((f) => f.type === "blob").length;
+
     if (flatData.length === 0) {
         return (
-            <div className="flex items-center justify-center h-48 text-white/30 text-sm">
-                Boyut verisi mevcut değil (GitHub API ağaç verisi boyut içermiyor olabilir).
+            <div className="flex flex-col items-center justify-center h-48 gap-3 text-white/30 text-sm">
+                <p>Boyut verisi mevcut değil (GitHub API ağaç verisi boyut içermiyor olabilir).</p>
+                {selectedLayer && onClearFilter && (
+                    <button
+                        onClick={onClearFilter}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-xs rounded-xl hover:bg-indigo-500/30 transition-colors"
+                    >
+                        <X className="w-3.5 h-3.5" /> Filtreyi Temizle
+                    </button>
+                )}
             </div>
         );
     }
@@ -168,7 +201,7 @@ export const TreemapVisualizer = React.memo(function TreemapVisualizer({ files }
     return (
         <div className="space-y-3">
             {/* Controls */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
                 <div className="space-y-0.5">
                     <h3 className="text-xs font-semibold text-white/30 uppercase tracking-widest">
                         Dosya Boyutu Isı Haritası
@@ -177,19 +210,38 @@ export const TreemapVisualizer = React.memo(function TreemapVisualizer({ files }
                         Toplam: <span className="text-white/50 font-medium">{formatBytes(totalBytes)}</span>
                     </p>
                 </div>
-                <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-xl p-1">
-                    {([1, 2, 3, 4] as Depth[]).map((d) => (
-                        <button
-                            key={d}
-                            onClick={() => setDepth(d)}
-                            className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${depth === d
-                                ? "bg-indigo-500/40 text-indigo-300 border border-indigo-500/40"
-                                : "text-white/30 hover:text-white/60"
-                                }`}
-                        >
-                            {d === 4 ? "Tam" : `D${d}`}
-                        </button>
-                    ))}
+
+                <div className="flex items-center gap-2">
+                    {/* Active filter chip */}
+                    {selectedLayer && onClearFilter && (
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/15 border border-indigo-500/40 rounded-xl text-xs text-indigo-300 font-semibold animate-in fade-in duration-200">
+                            <Filter className="w-3 h-3" />
+                            Filtre: {selectedLayer} ({filteredCount} dosya)
+                            <button
+                                onClick={onClearFilter}
+                                className="ml-1 hover:text-white transition-colors"
+                                title="Filtreyi temizle"
+                            >
+                                <X className="w-3 h-3" />
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Depth controls */}
+                    <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-xl p-1">
+                        {([1, 2, 3, 4] as Depth[]).map((d) => (
+                            <button
+                                key={d}
+                                onClick={() => setDepth(d)}
+                                className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${depth === d
+                                    ? "bg-indigo-500/40 text-indigo-300 border border-indigo-500/40"
+                                    : "text-white/30 hover:text-white/60"
+                                    }`}
+                            >
+                                {d === 4 ? "Tam" : `D${d}`}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
 
@@ -197,8 +249,7 @@ export const TreemapVisualizer = React.memo(function TreemapVisualizer({ files }
             <div className="w-full rounded-xl overflow-hidden border border-white/5" style={{ height: 340 }}>
                 <ResponsiveContainer width="100%" height="100%">
                     <Treemap
-                        // @ts-expect-error recharts TreemapDataType requires recursive index sig
-                        data={flatData}
+                        data={flatData as any}
                         dataKey="value"
                         nameKey="name"
                         content={<CustomContent />}
@@ -223,5 +274,4 @@ export const TreemapVisualizer = React.memo(function TreemapVisualizer({ files }
             </div>
         </div>
     );
-}
-);
+});

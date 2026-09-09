@@ -1,4 +1,4 @@
-import { Contributor, BusFactorResult, BusFactorRisk } from "@/types/repo";
+﻿import { Contributor, BusFactorResult, BusFactorRisk } from "@/types/repo";
 
 export function calculateBusFactor(contributors: Contributor[]): BusFactorResult {
     if (!contributors || contributors.length === 0) {

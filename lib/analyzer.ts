@@ -1,4 +1,4 @@
-import {
+﻿import {
     FileTreeItem,
     AnalysisResult,
     ArchitectureBucket,
@@ -9,9 +9,6 @@ import { runSecurityScan } from "@/lib/securityScanner";
 import { checkActivity } from "@/lib/activityChecker";
 import { auditPackages } from "@/lib/packageAudit";
 
-// ───────────────────────────────────────────────────────────────
-// O(1) STATIC HASH SETS (Zero Regex Runtime Overhead)
-// ───────────────────────────────────────────────────────────────
 const EXCLUDE_DIRS = new Set(['node_modules', '.git', '.next', 'dist', 'build', 'vendor', 'target', '.venv', 'out']);
 const CODE_EXTS = new Set(['ts', 'tsx', 'js', 'jsx', 'py', 'go', 'rs', 'java', 'c', 'cpp', 'cs', 'php', 'rb', 'swift', 'kt', 'vue', 'svelte']);
 const FRONTEND_DIRS = new Set(['app', 'pages', 'components', 'views', 'ui', 'styles', 'client', 'frontend', 'web']);
@@ -52,9 +49,6 @@ const EXT_TO_LANG: Record<string, string> = {
     bash: "Shell", dockerfile: "Docker", tf: "Terraform",
 };
 
-// ───────────────────────────────────────────────────────────────
-// DEPENDENCY EXTRACTION
-// ───────────────────────────────────────────────────────────────
 function parsePackageJson(raw: string | null): { deps: string[]; devDeps: string[] } {
     if (!raw) return { deps: [], devDeps: [] };
     try {
@@ -68,9 +62,6 @@ function parsePackageJson(raw: string | null): { deps: string[]; devDeps: string
     }
 }
 
-// ───────────────────────────────────────────────────────────────
-// MAIN ANALYZER (100% REGEX-FREE EVENT LOOP)
-// ───────────────────────────────────────────────────────────────
 export function analyzeRepo(
     files: FileTreeItem[],
     readme: string | null,
@@ -97,11 +88,9 @@ export function analyzeRepo(
     let hasCiCd = false;
     let hasIaC = false;
 
-    // Track top level directories for monolithic checks
     const topDirs = new Set<string>();
     const firstLevelPaths = new Set<string>();
 
-    // Buckets setup
     const archMap: Record<ArchitectureBucket["name"], string[]> = {
         Frontend: [], Backend: [], Database: [], "Infra/DevOps": [], Tests: [], Config: [], Other: []
     };
@@ -129,7 +118,6 @@ export function analyzeRepo(
         const baseName = parts[depth - 1];
         const lowerBase = baseName.toLowerCase();
 
-        // Ensure no excluded directories block important scoring, but skip their deep architecture mapping
         const firstSeg = parts[0];
         if (EXCLUDE_DIRS.has(firstSeg) && depth > 2) {
             continue; // Ignore deeply nested external/vendored folders for hot loop mapping
@@ -138,7 +126,6 @@ export function analyzeRepo(
         const extParts = lowerBase.split(".");
         const ext = extParts.length > 1 ? extParts[extParts.length - 1] : "";
 
-        // --- Heuristics & Classifications ---
         let isConfig = false;
         let isTest = false;
         let isInfra = false;
@@ -152,12 +139,10 @@ export function analyzeRepo(
             isTest = true;
         }
 
-        // Secret Leak Mather
         if (baseName === ".env" || baseName === ".env.local" || (baseName.startsWith(".env.") && !baseName.includes(".example") && !baseName.includes(".sample"))) {
             problems.push(`🔴 Kritik sır açığı şüphesi: ${path}`);
         }
 
-        // Feature / Quality Config Detectors
         if (lowerBase === ".gitignore") hasGitIgnore = true;
         else if (LOCKFILES.has(lowerBase)) hasLockfile = true;
         else if (LINTER_CONFIGS.has(lowerBase)) hasLinter = true;
@@ -169,13 +154,11 @@ export function analyzeRepo(
         if (lowerBase === "dockerfile" || lowerBase === "docker-compose.yml" || lowerBase === "docker-compose.yaml") hasIaC = true;
         if (path.includes(".github/workflows/")) hasCiCd = true;
 
-        // Language Counts
         const langInfo = EXT_TO_LANG[ext] || EXT_TO_LANG[lowerBase];
         if (langInfo) {
             langCounts[langInfo] = (langCounts[langInfo] || 0) + 1;
         }
 
-        // Architecture Bucketing (O(1) approach)
         const checkDir = parts[0] === "src" && depth > 1 ? parts[1] : parts[0];
         let bucket: ArchitectureBucket["name"] = "Other";
 
@@ -195,20 +178,14 @@ export function analyzeRepo(
             isInfra = true;
         }
 
-        // Limit rendering bloat by strictly capping output paths per bucket
         if (archMap[bucket].length < 3) {
             archMap[bucket].push(path);
         }
     }
 
-    // ───────────────────────────────────────────────────────────────
-    // ALGORITHMIC SCORING
-    // ───────────────────────────────────────────────────────────────
 
-    // 1. Test Score
     const testScore = Math.min(100, Math.round((testFilesCount / Math.max(1, codeFilesCount * 0.33)) * 100));
 
-    // 2. Doc Score
     let docScore = 0;
     if (hasReadme) {
         docScore += 20;
@@ -220,7 +197,6 @@ export function analyzeRepo(
     if (hasChangelog) docScore += 15;
     docScore = Math.min(100, docScore);
 
-    // 3. Health Score
     let healthScore = 60;
     if (hasGitIgnore) healthScore += 10;
     if (hasLinter) healthScore += 10;
@@ -238,9 +214,6 @@ export function analyzeRepo(
 
     const overallScore = Math.round((testScore + docScore + healthScore) / 3);
 
-    // ───────────────────────────────────────────────────────────────
-    // GENERATE INSIGHTS
-    // ───────────────────────────────────────────────────────────────
 
     if (testScore > 50) practices.push("✅ Sağlıklı Test Kapsamı");
     if (hasCiCd) practices.push("✅ CI/CD İş Akışı (GitHub Actions vb.)");
@@ -257,7 +230,6 @@ export function analyzeRepo(
     if (!hasCiCd) problems.push("🟡 Otomatize Edilmiş CI/CD Bulunamadı");
     if (topDirs.size <= 2 && totalFiles > 30) problems.push("🟡 Monolitik Katman Görünümü (Top-level klasörleşme yetersiz)");
 
-    // Language aggregation
     const totalLangFiles = Object.values(langCounts).reduce((a, b) => a + b, 0);
     const topLanguages = Object.entries(langCounts)
         .map(([lang, count]) => ({
@@ -270,7 +242,6 @@ export function analyzeRepo(
 
     const { deps, devDeps } = parsePackageJson(packageJson);
 
-    // Filter buckets for visual consumption
     const architectureList = (["Frontend", "Backend", "Database", "Infra/DevOps", "Tests", "Config", "Other"] as ArchitectureBucket["name"][])
         .map(name => ({
             name,
@@ -305,5 +276,6 @@ export function analyzeRepo(
         security,
         activity: activityInfo,
         packageAudit,
+        devopsAudit: { scanned: false, findings: [] },
     };
 }

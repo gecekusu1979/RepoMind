@@ -1,8 +1,5 @@
-import { FileTreeItem, SecurityFinding, SecurityRiskLevel, SecurityScanResult } from "@/types/repo";
+﻿import { FileTreeItem, SecurityFinding, SecurityRiskLevel, SecurityScanResult } from "@/types/repo";
 
-// ─────────────────────────────────────────────────────────────────
-// Risk Patterns
-// ─────────────────────────────────────────────────────────────────
 
 interface RiskPattern {
     test: (path: string, lower: string) => boolean;
@@ -12,7 +9,6 @@ interface RiskPattern {
 }
 
 const PATTERNS: RiskPattern[] = [
-    // Private keys & certificates
     {
         test: (_, l) => l.endsWith(".pem") || l.endsWith(".key") || l.endsWith(".pfx") || l.endsWith(".p12"),
         severity: "critical",
@@ -25,7 +21,6 @@ const PATTERNS: RiskPattern[] = [
         reason: "SSH özel anahtarı olabilir",
         recommendation: "SSH anahtarını hemen iptal edin, yeni bir çift oluşturun ve kayıt geçmişini temizleyin.",
     },
-    // Committed .env files
     {
         test: (_, l) =>
             l === ".env.production" || l === ".env.local" || l === ".env.staging" ||
@@ -40,21 +35,18 @@ const PATTERNS: RiskPattern[] = [
         reason: ".env dosyası kaydedilmiş — üretim sırları riske girebilir",
         recommendation: ".gitignore'a '.env' ekleyin ve geçmişten temizleyin.",
     },
-    // npm credentials
     {
         test: (_, l) => l === ".npmrc",
         severity: "low",
         reason: ".npmrc dosyası auth token içerebilir",
         recommendation: ".npmrc dosyasında _authToken veya _auth satırı olup olmadığını kontrol edin; varsa secrets yöneticisi kullanın.",
     },
-    // AWS credentials
     {
         test: (p) => p.includes(".aws/credentials") || p.includes(".aws/config"),
         severity: "critical",
         reason: "AWS kimlik dosyası kaydedilmiş",
         recommendation: "AWS kimlik bilgilerini derhal geçersiz kılın ve IAM rolü veya secrets manager kullanın.",
     },
-    // Database dumps
     {
         test: (_, l) => l.endsWith(".sql") || l.endsWith(".dump"),
         severity: "low",
@@ -67,7 +59,6 @@ const PATTERNS: RiskPattern[] = [
         reason: "SQLite/veritabanı dosyası kaydedilmiş",
         recommendation: "İkili veritabanı dosyaları .gitignore'a eklenmelidir. Git LFS veya migration kullanmayı göz önünde bulundurun.",
     },
-    // Keystore & wallet files
     {
         test: (_, l) => l.endsWith(".keystore") || l.endsWith(".jks"),
         severity: "critical",
@@ -80,7 +71,6 @@ const PATTERNS: RiskPattern[] = [
         reason: "Cüzdan veya ikili veri dosyası kaydedilmiş",
         recommendation: "Bu dosyanın hassas veri içermediğini doğrulayın.",
     },
-    // Docker / CI secrets
     {
         test: (_, l) => l === "docker-compose.override.yml",
         severity: "low",
@@ -89,9 +79,6 @@ const PATTERNS: RiskPattern[] = [
     },
 ];
 
-// ─────────────────────────────────────────────────────────────────
-// Scanner
-// ─────────────────────────────────────────────────────────────────
 
 export function runSecurityScan(files: FileTreeItem[]): SecurityScanResult {
     const findings: SecurityFinding[] = [];
@@ -114,7 +101,6 @@ export function runSecurityScan(files: FileTreeItem[]): SecurityScanResult {
         }
     }
 
-    // Deduplicate by path
     const unique = findings.filter(
         (f, i, arr) => arr.findIndex((x) => x.path === f.path) === i
     );

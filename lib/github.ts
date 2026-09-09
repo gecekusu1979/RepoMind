@@ -1,4 +1,4 @@
-import { FileTreeItem, RepoMeta, ParsedGitHubUrl } from "@/types/repo";
+﻿import { FileTreeItem, RepoMeta, ParsedGitHubUrl } from "@/types/repo";
 
 const GITHUB_API = "https://api.github.com";
 
@@ -7,7 +7,6 @@ function getHeaders(): HeadersInit {
         Accept: "application/vnd.github.v3+json",
         "User-Agent": "RepoMind-App",
     };
-    // Token is strictly optional — app works anonymously (60 req/hr)
     const token = process.env.GITHUB_TOKEN;
     if (token) {
         headers["Authorization"] = `Bearer ${token}`;
@@ -16,7 +15,6 @@ function getHeaders(): HeadersInit {
 }
 
 export function isValidGitHubSlug(segment: string): boolean {
-    // Allow alphanumeric characters, underscores, and single hyphens; reject dots/traversals
     return /^[a-zA-Z0-9_-]+$/.test(segment) && segment !== '..' && segment !== '.';
 }
 
@@ -153,6 +151,7 @@ export async function fetchRawFile(
     path: string,
     branch: string
 ): Promise<string | null> {
+    const MAX_BYTES = 512 * 1024;
     try {
         const headers: HeadersInit = { "User-Agent": "RepoMind-App" };
         const token = process.env.GITHUB_TOKEN;
@@ -163,7 +162,13 @@ export async function fetchRawFile(
             { headers, next: { revalidate: 60 } }
         );
         if (!res.ok) return null;
-        return await res.text();
+
+        const contentLength = res.headers.get("content-length");
+        if (contentLength && parseInt(contentLength, 10) > MAX_BYTES) return null;
+
+        const text = await res.text();
+        if (text.length > MAX_BYTES) return text.slice(0, MAX_BYTES);
+        return text;
     } catch {
         return null;
     }

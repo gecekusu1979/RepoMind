@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { fetchRepoMeta, fetchFileTree, fetchCriticalFiles } from "@/lib/github";
+import { fetchRepoMeta, fetchFileTree, fetchCriticalFiles, isValidGitHubSlug } from "@/lib/github";
 import { analyzeRepo } from "@/lib/analyzer";
 
 export const runtime = "edge";
@@ -49,8 +49,15 @@ export async function GET(
 ) {
     const { owner, repo } = await params;
 
+    if (!isValidGitHubSlug(owner) || !isValidGitHubSlug(repo)) {
+        const errorSvg = buildSvg("RepoMind", "geçersiz", "#6b7280");
+        return new Response(errorSvg, { headers: { "Content-Type": "image/svg+xml", "Cache-Control": "no-cache" } });
+    }
+
     const url = new URL(req.url);
-    const metric = url.searchParams.get("metric") ?? "health";
+    const rawMetric = url.searchParams.get("metric") ?? "health";
+    const ALLOWED_METRICS = new Set(["health", "test", "doc", "overall"]);
+    const metric = ALLOWED_METRICS.has(rawMetric) ? rawMetric : "health";
 
     try {
         const meta = await fetchRepoMeta(owner, repo);

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { PackageAuditResult } from "@/types/repo";
 import { Package, ShieldAlert, Code, AlertTriangle, CheckCircle } from "lucide-react";
@@ -15,7 +15,6 @@ export function PackageAuditCard({ audit }: PackageAuditCardProps) {
 
     const hasFindings = audit.findings.length > 0;
 
-    // Group findings dynamically
     const depr = audit.findings.filter(f => !f.name.startsWith("script:") && f.name !== "license");
     const scripts = audit.findings.filter(f => f.name.startsWith("script:"));
     const license = audit.findings.filter(f => f.name === "license");

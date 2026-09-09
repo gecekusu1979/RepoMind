@@ -1,8 +1,5 @@
-import { FileTreeItem } from "@/types/repo";
+﻿import { FileTreeItem } from "@/types/repo";
 
-// ─────────────────────────────────────────────────────────────────
-// Types & Interfaces
-// ─────────────────────────────────────────────────────────────────
 
 export type TreemapCategory = 'code' | 'markup' | 'asset' | 'config' | 'aggregate' | 'other';
 
@@ -18,9 +15,6 @@ export interface TreemapNode {
     depth?: number;
 }
 
-// ─────────────────────────────────────────────────────────────────
-// Definitions & Sets
-// ─────────────────────────────────────────────────────────────────
 
 const EXCLUDE_DIRS = new Set(['node_modules', '.git', '.next', 'dist', 'build', 'vendor', 'target', '.venv', 'out']);
 
@@ -37,9 +31,6 @@ export const CATEGORY_COLORS: Record<TreemapCategory, string> = {
     other: "#71717a", // Fallback
 };
 
-// ─────────────────────────────────────────────────────────────────
-// Formatters & Parsers
-// ─────────────────────────────────────────────────────────────────
 
 export function formatBytes(bytes: number): string {
     if (bytes === 0) return "0 B";
@@ -72,9 +63,6 @@ export function getFileCategory(filename: string): TreemapCategory {
     return 'config';
 }
 
-// ─────────────────────────────────────────────────────────────────
-// Builder Classes (AST)
-// ─────────────────────────────────────────────────────────────────
 
 class DirBuilder {
     children = new Map<string, DirBuilder>();
@@ -84,25 +72,19 @@ class DirBuilder {
     deeperBytes = 0;
 }
 
-// ─────────────────────────────────────────────────────────────────
-// Main Tree Construction (DOM-Bomb Guarded)
-// ─────────────────────────────────────────────────────────────────
 
 export function buildTreemap(files: FileTreeItem[]): TreemapNode {
     const root = new DirBuilder();
 
-    // 1. Single Pass Build Phase
     for (const f of files) {
         if (f.type !== 'blob') continue;
 
         const rawParts = f.path.split('/');
 
-        // Discard excluded directories entirely (e.g. node_modules, .git)
         if (rawParts.length > 0 && EXCLUDE_DIRS.has(rawParts[0])) {
             continue;
         }
 
-        // Recharts cannot render 0-value rects. Fallback to 1024 per constraints.
         const size = typeof f.size === 'number' && f.size > 0 ? f.size : 1024;
         root.totalBytes += size;
 
@@ -121,8 +103,6 @@ export function buildTreemap(files: FileTreeItem[]): TreemapNode {
 
         const dirParts = rawParts.slice(0, -1);
 
-        // Aggegate deep files instantly. Hard Depth Ceiling = 3
-        // Parts lengths correspond to nested subfolders.
         if (dirParts.length > 3) {
             const allowedDirs = dirParts.slice(0, 3);
             let current = root;
@@ -144,11 +124,9 @@ export function buildTreemap(files: FileTreeItem[]): TreemapNode {
         }
     }
 
-    // 2. Recursive Serialization Phase (with sibling ceilings)
     function convert(builder: DirBuilder, dirName: string, currentPath: string, depth = 0): TreemapNode {
         const childrenNodes: (TreemapNode & { rawValue: number })[] = [];
 
-        // Push subdirectories
         for (const [subDirName, subBuilder] of builder.children.entries()) {
             const subPath = currentPath ? `${currentPath}/${subDirName}` : subDirName;
             const subNode = convert(subBuilder, subDirName, subPath, depth + 1);
@@ -158,7 +136,6 @@ export function buildTreemap(files: FileTreeItem[]): TreemapNode {
             });
         }
 
-        // Push concrete files
         for (const f of builder.files) {
             childrenNodes.push({
                 ...f,
@@ -167,7 +144,6 @@ export function buildTreemap(files: FileTreeItem[]): TreemapNode {
             });
         }
 
-        // Push Depth Ceiling synthetic node
         if (builder.deeperFileCount > 0) {
             childrenNodes.push({
                 name: `+${builder.deeperFileCount} deeper files`,
@@ -182,7 +158,6 @@ export function buildTreemap(files: FileTreeItem[]): TreemapNode {
             });
         }
 
-        // Apply Sibling Ceiling
         childrenNodes.sort((a, b) => b.rawValue - a.rawValue);
 
         let finalChildren: TreemapNode[] = childrenNodes;
@@ -221,7 +196,6 @@ export function buildTreemap(files: FileTreeItem[]): TreemapNode {
 
     const rootNode = convert(root, "root", "", 0);
 
-    // Safeguard for empty repos
     if (!rootNode.children) {
         rootNode.children = [];
     }
@@ -229,9 +203,6 @@ export function buildTreemap(files: FileTreeItem[]): TreemapNode {
     return rootNode;
 }
 
-// ─────────────────────────────────────────────────────────────────
-// Recharts Visualizer Compat
-// ─────────────────────────────────────────────────────────────────
 
 export function filterByDepth(node: TreemapNode, maxDepth: number): TreemapNode {
     if (!node.children || node.children.length === 0 || maxDepth <= 0) {

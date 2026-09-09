@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { BusFactorResult, RepoMeta } from "@/types/repo";
@@ -36,7 +36,6 @@ export function BusFactorCard({ meta }: BusFactorCardProps) {
     }, [meta.owner, meta.name]);
 
     useEffect(() => {
-        // IntersectionObserver for rate-limit protection (Lazy load)
         const observer = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting) {

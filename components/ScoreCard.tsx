@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 interface ScoreCardProps {
     label: string;

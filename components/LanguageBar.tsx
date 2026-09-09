@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 interface LanguageBarProps {
     languages: { lang: string; count: number; percentage: number }[];

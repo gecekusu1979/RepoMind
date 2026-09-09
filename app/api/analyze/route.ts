@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import {
     parseGitHubUrl,
     fetchRepoMeta,
@@ -6,17 +6,35 @@ import {
     fetchCriticalFiles,
 } from "@/lib/github";
 import { analyzeRepo } from "@/lib/analyzer";
+import { runDevopsLinter } from "@/lib/devopsLinter";
 
 export const runtime = "edge";
 
+const MAX_URL_LENGTH = 256;
+
 export async function POST(req: NextRequest) {
     try {
+        const contentType = req.headers.get("content-type") ?? "";
+        if (!contentType.includes("application/json")) {
+            return NextResponse.json(
+                { error: "Content-Type application/json olmalıdır." },
+                { status: 415 }
+            );
+        }
+
         const body = await req.json();
-        const { url } = body as { url?: string };
+        const { url } = body as { url?: unknown };
 
         if (!url || typeof url !== "string") {
             return NextResponse.json(
                 { error: "Eksik veya geçersiz URL parametresi." },
+                { status: 400 }
+            );
+        }
+
+        if (url.length > MAX_URL_LENGTH) {
+            return NextResponse.json(
+                { error: "URL çok uzun. Maksimum 256 karakter." },
                 { status: 400 }
             );
         }
@@ -33,7 +51,6 @@ export async function POST(req: NextRequest) {
 
         const { owner, repo } = parsed;
 
-        // Fetch repo metadata
         let meta;
         try {
             meta = await fetchRepoMeta(owner, repo);
@@ -47,7 +64,6 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: msg }, { status });
         }
 
-        // Fetch file tree
         let treeResult;
         try {
             treeResult = await fetchFileTree(owner, repo, meta.defaultBranch);
@@ -60,17 +76,14 @@ export async function POST(req: NextRequest) {
 
         const { items, truncated } = treeResult;
 
-        // Fetch README + package.json
-        const { readme, packageJson } = await fetchCriticalFiles(
-            owner,
-            repo,
-            meta.defaultBranch,
-            items
-        );
+        const [{ readme, packageJson }, devopsAudit] = await Promise.all([
+            fetchCriticalFiles(owner, repo, meta.defaultBranch, items),
+            runDevopsLinter(owner, repo, meta.defaultBranch, items),
+        ]);
 
         const analysis = analyzeRepo(items, readme, packageJson, truncated, meta);
 
-        return NextResponse.json({ meta, analysis });
+        return NextResponse.json({ meta, analysis: { ...analysis, devopsAudit } });
     } catch (e: unknown) {
         const msg =
             e instanceof Error ? e.message : "Sunucu hatası oluştu.";

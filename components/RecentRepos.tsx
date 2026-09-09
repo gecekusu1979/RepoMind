@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { RecentRepo } from "@/types/repo";
@@ -30,7 +30,6 @@ export function RecentRepos({ onSelect, currentRepo }: RecentReposProps) {
         setRecents(getRecents());
     }, []);
 
-    // Refresh TTL display every 30 seconds
     useEffect(() => {
         const update = () => {
             const newTtls: Record<string, number> = {};

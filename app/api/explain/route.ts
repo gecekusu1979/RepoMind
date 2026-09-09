@@ -1,11 +1,8 @@
-import { NextRequest } from "next/server";
+﻿import { NextRequest } from "next/server";
 import { AnalyzeResponse, ArchitectureBucket } from "@/types/repo";
 
 export const runtime = "edge";
 
-// ─────────────────────────────────────────────────────────────────
-// Helper Utilities
-// ─────────────────────────────────────────────────────────────────
 
 function formatScore(score: number): string {
     if (score >= 80) return `**${score}/100** ✅ (Mükemmel)`;
@@ -26,9 +23,6 @@ function formatStars(n: number): string {
     return n.toString();
 }
 
-// ─────────────────────────────────────────────────────────────────
-// Project Domain Classification
-// ─────────────────────────────────────────────────────────────────
 
 function classifyProjectDomain(data: AnalyzeResponse): string {
     const { analysis, meta } = data;
@@ -45,45 +39,34 @@ function classifyProjectDomain(data: AnalyzeResponse): string {
     const hasDb = archNames.includes("Database");
     const hasInfra = archNames.includes("Infra/DevOps");
 
-    // CLI tool
     if (deps.some((d) => ["commander", "yargs", "meow", "minimist", "inquirer", "oclif"].includes(d)))
         return "**CLI Aracı** — Komut satırı uygulaması";
 
-    // Full-stack web app
     if (hasFrontend && hasBackend && hasDb)
         return "**Full-Stack Web Uygulaması** — Uçtan uca istemci + sunucu + veritabanı katmanları";
 
-    // Frontend only
     if (hasFrontend && !hasBackend)
         return "**Frontend Web Uygulaması** — İstemci taraflı kullanıcı arayüzü";
 
-    // Backend / API
     if (hasBackend && !hasFrontend)
         return "**Backend Servisi / REST API** — Sunucu taraflı iş mantığı ve API katmanı";
 
-    // Library/Package
     if (deps.includes("rollup") || deps.includes("tsup") || deps.includes("unbuild") ||
         desc.includes("library") || desc.includes("package") || desc.includes("sdk"))
         return "**Kütüphane / SDK / NPM Paketi** — Yeniden kullanılabilir modül";
 
-    // Infrastructure / DevOps
     if (hasInfra && archNames.length <= 2)
         return "**Altyapı / DevOps Projesi** — Konteyner, IaC veya otomasyon yapılandırması";
 
-    // Mobile
     if (lang === "dart" || deps.some((d) => d.includes("react-native") || d.includes("expo")))
         return "**Mobil Uygulama** — Çapraz platform veya native mobil";
 
-    // Python data/ML
     if (lang === "python" && desc.match(/ml|machine learning|model|neural|data/))
         return "**Veri Bilimi / Makine Öğrenmesi Projesi**";
 
     return "**Çok Amaçlı Yazılım Projesi**";
 }
 
-// ─────────────────────────────────────────────────────────────────
-// Tech Stack Inference
-// ─────────────────────────────────────────────────────────────────
 
 function inferTechStack(data: AnalyzeResponse): string[] {
     const allDeps = [
@@ -94,10 +77,8 @@ function inferTechStack(data: AnalyzeResponse): string[] {
     const archNames = data.analysis.architecture.map((b) => b.name);
     const stack: string[] = [];
 
-    // Language
     if (lang) stack.push(`**Dil:** ${lang}`);
 
-    // Frameworks / runtimes
     if (allDeps.includes("next") || allDeps.includes("next.js")) stack.push("**Framework:** Next.js");
     else if (allDeps.includes("nuxt") || allDeps.includes("nuxt3")) stack.push("**Framework:** Nuxt.js");
     else if (allDeps.includes("react")) stack.push("**UI Kütüphanesi:** React");
@@ -106,14 +87,12 @@ function inferTechStack(data: AnalyzeResponse): string[] {
     else if (allDeps.includes("angular") || allDeps.includes("@angular/core")) stack.push("**Framework:** Angular");
     else if (allDeps.includes("solid-js")) stack.push("**Framework:** SolidJS");
 
-    // Backend
     if (allDeps.includes("express")) stack.push("**Web Sunucusu:** Express.js");
     else if (allDeps.includes("fastify")) stack.push("**Web Sunucusu:** Fastify");
     else if (allDeps.includes("hono")) stack.push("**Web Sunucusu:** Hono");
     else if (allDeps.includes("koa")) stack.push("**Web Sunucusu:** Koa");
     else if (allDeps.includes("nestjs") || allDeps.includes("@nestjs/core")) stack.push("**Framework:** NestJS");
 
-    // Database / ORM
     if (allDeps.includes("@prisma/client") || allDeps.includes("prisma")) stack.push("**ORM:** Prisma");
     else if (allDeps.includes("drizzle-orm")) stack.push("**ORM:** Drizzle");
     else if (allDeps.includes("mongoose")) stack.push("**ODM:** Mongoose / MongoDB");
@@ -123,7 +102,6 @@ function inferTechStack(data: AnalyzeResponse): string[] {
     else if (allDeps.includes("mysql2") || allDeps.includes("mysql")) stack.push("**Veritabanı:** MySQL");
     else if (allDeps.includes("better-sqlite3") || allDeps.includes("sqlite3")) stack.push("**Veritabanı:** SQLite");
 
-    // Build / tooling
     if (allDeps.includes("typescript")) stack.push("**Tip Sistemi:** TypeScript");
     if (allDeps.includes("vite")) stack.push("**Bundler:** Vite");
     else if (allDeps.includes("webpack")) stack.push("**Bundler:** Webpack");
@@ -133,27 +111,21 @@ function inferTechStack(data: AnalyzeResponse): string[] {
     else if (allDeps.includes("styled-components")) stack.push("**CSS-in-JS:** styled-components");
     else if (allDeps.includes("@emotion/react")) stack.push("**CSS-in-JS:** Emotion");
 
-    // State
     if (allDeps.includes("zustand")) stack.push("**State:** Zustand");
     else if (allDeps.includes("redux") || allDeps.includes("@reduxjs/toolkit")) stack.push("**State:** Redux Toolkit");
     else if (allDeps.includes("jotai")) stack.push("**State:** Jotai");
     else if (allDeps.includes("recoil")) stack.push("**State:** Recoil");
 
-    // Testing
     if (allDeps.includes("vitest")) stack.push("**Test:** Vitest");
     else if (allDeps.includes("jest")) stack.push("**Test:** Jest");
     if (allDeps.includes("playwright")) stack.push("**E2E:** Playwright");
     else if (allDeps.includes("cypress")) stack.push("**E2E:** Cypress");
 
-    // Infra
     if (archNames.includes("Infra/DevOps")) stack.push("**CI/CD:** GitHub Actions veya benzeri");
 
     return stack;
 }
 
-// ─────────────────────────────────────────────────────────────────
-// Entry Point Detection
-// ─────────────────────────────────────────────────────────────────
 
 function detectEntryPoints(data: AnalyzeResponse): string[] {
     const paths = data.analysis.firstLevelTree;
@@ -177,9 +149,6 @@ function detectEntryPoints(data: AnalyzeResponse): string[] {
     return entries.slice(0, 3);
 }
 
-// ─────────────────────────────────────────────────────────────────
-// Architecture Layer Detail
-// ─────────────────────────────────────────────────────────────────
 
 function describeArchLayer(bucket: ArchitectureBucket): string {
     const samplePaths = bucket.paths.slice(0, 4).map((p) => `\`${p}\``).join(", ");
@@ -198,13 +167,9 @@ function describeArchLayer(bucket: ArchitectureBucket): string {
     return descriptions[bucket.name] ?? `${bucket.name} — ${count} dosya. ${samplePaths}`;
 }
 
-// ─────────────────────────────────────────────────────────────────
-// README Summary Extraction
-// ─────────────────────────────────────────────────────────────────
 
 function extractReadmeSummary(readme: string): string {
     if (!readme || readme.length < 10) return "";
-    // Strip markdown badges, HTML comments, shields.io lines
     const cleaned = readme
         .replace(/\[!\[.*?\]\(.*?\)\]\(.*?\)/g, "") // badge links
         .replace(/<!--[\s\S]*?-->/g, "")             // HTML comments
@@ -212,14 +177,10 @@ function extractReadmeSummary(readme: string): string {
         .replace(/\n{3,}/g, "\n\n")
         .trim();
 
-    // Find first meaningful paragraph (>50 chars)
     const paragraphs = cleaned.split(/\n\n+/).map((p) => p.trim()).filter((p) => p.length > 50);
     return paragraphs[0]?.slice(0, 400) ?? readme.slice(0, 300);
 }
 
-// ─────────────────────────────────────────────────────────────────
-// Main Report Generator
-// ─────────────────────────────────────────────────────────────────
 
 function generateReport(data: AnalyzeResponse): string {
     const { meta, analysis } = data;
@@ -235,7 +196,6 @@ function generateReport(data: AnalyzeResponse): string {
     const otherBucket = architecture.find((b) => b.name === "Other");
     const totalLangFiles = topLanguages.reduce((s, l) => s + l.count, 0);
 
-    // ── Section 1: What This Project Does ──────────────────────────
     let section1 = `### 📌 1. Bu Proje Ne İşe Yarar?\n\n`;
     section1 += `**${meta.fullName}** — ${domain}\n\n`;
 
@@ -258,7 +218,6 @@ function generateReport(data: AnalyzeResponse): string {
         section1 += `- 🏷️ Konular: ${meta.topics.slice(0, 8).map((t) => `\`${t}\``).join(", ")}\n`;
     }
 
-    // ── Section 2: Architecture ─────────────────────────────────────
     let section2 = `\n---\n\n### 🏗️ 2. Mimari Yapı & Veri Akışı\n\n`;
 
     if (archLayers.length > 0) {
@@ -273,7 +232,6 @@ function generateReport(data: AnalyzeResponse): string {
         section2 += `_Belirgin bir mimari katman tespit edilemedi — proje tek klasörde yayılmış olabilir._\n`;
     }
 
-    // First-level tree snapshot
     if (firstLevelTree.length > 0) {
         section2 += `\n**Kök Dizin Yapısı (ilk 2 seviye):**\n\`\`\`\n`;
         section2 += firstLevelTree.slice(0, 20).join("\n");
@@ -281,7 +239,6 @@ function generateReport(data: AnalyzeResponse): string {
         section2 += `\n\`\`\`\n`;
     }
 
-    // Tech stack
     if (stack.length > 0) {
         section2 += `\n**Tespit Edilen Teknoloji Yığını:**\n`;
         for (const s of stack) {
@@ -289,7 +246,6 @@ function generateReport(data: AnalyzeResponse): string {
         }
     }
 
-    // Language distribution
     if (topLanguages.length > 0) {
         section2 += `\n**Dil Dağılımı** (${totalLangFiles} kod dosyası):\n`;
         for (const l of topLanguages.slice(0, 6)) {
@@ -298,15 +254,12 @@ function generateReport(data: AnalyzeResponse): string {
         }
     }
 
-    // Entry points
     if (entries.length > 0) {
         section2 += `\n**Muhtemel Giriş Noktaları:** ${entries.join(" · ")}\n`;
     }
 
-    // ── Section 3: Contributor Guide & Findings ─────────────────────
     let section3 = `\n---\n\n### 🚀 3. Katkıcı Başlangıç Rehberi & Kritik Bulgular\n\n`;
 
-    // Quality overview table
     section3 += `**Kalite Metrikleri:**\n\n`;
     section3 += `| Metrik | Puan | Değerlendirme |\n`;
     section3 += `|--------|------|---------------|\n`;
@@ -315,7 +268,6 @@ function generateReport(data: AnalyzeResponse): string {
     section3 += `| 💊 Kod Sağlığı | ${metrics.healthScore}/100 | ${getScoreLabel(metrics.healthScore)} |\n`;
     section3 += `| 🏆 Genel Skor | ${metrics.overall}/100 | ${getScoreLabel(metrics.overall)} |\n\n`;
 
-    // Contributor start guide based on arch
     section3 += `**Nereden Başlamalı?**\n`;
     if (entries.length > 0) {
         section3 += `1. 📂 Uygulamanın ana giriş noktası: ${entries[0]}\n`;
@@ -336,7 +288,6 @@ function generateReport(data: AnalyzeResponse): string {
     }
     section3 += `\n`;
 
-    // Good practices
     if (goodPractices.length > 0) {
         section3 += `**Güçlü Yönler (${goodPractices.length} iyi uygulama tespit edildi):**\n`;
         for (const p of goodPractices) {
@@ -345,7 +296,6 @@ function generateReport(data: AnalyzeResponse): string {
         section3 += "\n";
     }
 
-    // Potential problems
     if (potentialProblems.length > 0) {
         section3 += `**⚠️ Dikkat Edilmesi Gereken Noktalar (${potentialProblems.length} bulgu):**\n`;
         for (const p of potentialProblems) {
@@ -354,7 +304,6 @@ function generateReport(data: AnalyzeResponse): string {
         section3 += "\n";
     }
 
-    // Dependency count insight
     if (analysis.hasPackageJson) {
         const depCount = analysis.dependencies.length;
         const devDepCount = analysis.devDependencies.length;
@@ -367,12 +316,10 @@ function generateReport(data: AnalyzeResponse): string {
         section3 += "\n";
     }
 
-    // Truncation note
     if (analysis.truncated) {
         section3 += `> ℹ️ **Not:** Bu deponun dosya ağacı 100.000 öğeyi aşmaktadır. Analiz ilk 100k girdi üzerinden yapılmıştır.\n\n`;
     }
 
-    // Footer
     section3 += `---\n_Bu rapor RepoMind heuristik motoru tarafından oluşturulmuştur — harici API anahtarı kullanılmadan._\n`;
 
     return section1 + section2 + section3;
@@ -385,21 +332,30 @@ function getScoreLabel(score: number): string {
     return "🔴 Zayıf";
 }
 
-// ─────────────────────────────────────────────────────────────────
-// Streaming Route Handler
-// ─────────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
     let data: AnalyzeResponse;
     try {
+        const contentType = req.headers.get("content-type") ?? "";
+        if (!contentType.includes("application/json")) {
+            return new Response("Content-Type application/json olmalıdır.", { status: 415 });
+        }
         data = await req.json();
     } catch {
         return new Response("Geçersiz istek gövdesi.", { status: 400 });
     }
 
+    if (
+        !data ||
+        typeof data !== "object" ||
+        typeof data.meta?.owner !== "string" ||
+        typeof data.analysis !== "object"
+    ) {
+        return new Response("Geçersiz veri yapısı.", { status: 400 });
+    }
+
     const report = generateReport(data);
 
-    // Split report into words (preserve whitespace structure)
     const words = report.split(/(?<=\s)|(?=\s)/);
 
     const encoder = new TextEncoder();
@@ -407,7 +363,6 @@ export async function POST(req: NextRequest) {
         async start(controller) {
             for (const word of words) {
                 controller.enqueue(encoder.encode(word));
-                // ~15ms pacing: yields typewriter effect without blocking
                 await new Promise<void>((resolve) => setTimeout(resolve, 15));
             }
             controller.close();

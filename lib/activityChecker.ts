@@ -1,8 +1,5 @@
-import { ActivityResult, ActivityStatus } from "@/types/repo";
+﻿import { ActivityResult, ActivityStatus } from "@/types/repo";
 
-// ─────────────────────────────────────────────────────────────────
-// Activity Detection
-// ─────────────────────────────────────────────────────────────────
 
 const STATUS_CONFIG: Record<
     ActivityStatus,
@@ -25,25 +22,19 @@ export function checkActivity(updatedAt: string, createdAt: string): ActivityRes
     let activityScore: number;
 
     if (ageDays < 30) {
-        // Very new project
         status = "Yeni Proje";
         activityScore = 90;
     } else if (daysSinceUpdate < 30) {
         status = "Aktif Geliştirme";
-        // Score decays slightly with age relative to how recent the update is
         activityScore = Math.max(75, 100 - Math.floor(daysSinceUpdate * 0.8));
     } else if (daysSinceUpdate < 180) {
-        // 1–6 months
         status = "Aktif Geliştirme";
         activityScore = Math.max(50, 74 - Math.floor((daysSinceUpdate - 30) * 0.4));
     } else if (daysSinceUpdate < 365) {
-        // 6–12 months
         status = "Düşük Aktivite";
         activityScore = Math.max(20, 49 - Math.floor((daysSinceUpdate - 180) * 0.15));
     } else {
-        // > 12 months
         status = "Terk Edilmiş (Stale)";
-        // Harder decay
         activityScore = Math.max(0, 20 - Math.floor((daysSinceUpdate - 365) / 30));
     }
 

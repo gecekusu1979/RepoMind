@@ -1,4 +1,4 @@
-export interface RepoMeta {
+﻿export interface RepoMeta {
   owner: string;
   name: string;
   fullName: string;
@@ -39,7 +39,6 @@ export interface MetricScores {
   overall: number;
 }
 
-// ─── Security ───────────────────────────────────────────────────
 
 export type SecurityRiskLevel = "Clean" | "Low" | "Critical";
 
@@ -55,7 +54,6 @@ export interface SecurityScanResult {
   findings: SecurityFinding[];
 }
 
-// ─── Activity ───────────────────────────────────────────────────
 
 export type ActivityStatus =
   | "Aktif Geliştirme"
@@ -71,7 +69,6 @@ export interface ActivityResult {
   emoji: string;
 }
 
-// ─── Treemap ────────────────────────────────────────────────────
 
 export type FileCategory = "code" | "styling" | "assets" | "config" | "other";
 
@@ -84,7 +81,6 @@ export interface TreemapNode {
   depth?: number;
 }
 
-// ─── Contributors & Bus Factor ──────────────────────────────────
 
 export interface Contributor {
   login: string;
@@ -105,7 +101,6 @@ export interface BusFactorResult {
   advice: string;
 }
 
-// ─── Issues ─────────────────────────────────────────────────────
 
 export interface GitHubIssue {
   id: number;
@@ -119,7 +114,6 @@ export interface GitHubIssue {
   };
 }
 
-// ─── Package Audit ──────────────────────────────────────────────
 
 export type PackageRiskSeverity = "high" | "medium";
 
@@ -135,7 +129,30 @@ export interface PackageAuditResult {
   findings: PackageAuditFinding[];
 }
 
-// ─── Cache ──────────────────────────────────────────────────────
+
+export interface DevOpsFinding {
+  file: string;
+  line?: number;
+  rule: string;
+  severity: 'warning' | 'critical';
+  message: string;
+  remediation: string;
+}
+
+export interface DevOpsAuditResult {
+  scanned: boolean;
+  findings: DevOpsFinding[];
+}
+
+
+export type PulseStatus = 'active' | 'low' | 'zombie';
+
+export interface PulseResult {
+  daysSinceLastCommit: number;
+  status: PulseStatus;
+  lastCommitDate: string;
+}
+
 
 export interface CachedAnalysis {
   data: AnalyzeResponse;
@@ -149,7 +166,6 @@ export interface RecentRepo {
   language: string | null;
 }
 
-// ─── Analysis ───────────────────────────────────────────────────
 
 export interface AnalysisResult {
   totalFiles: number;
@@ -169,6 +185,7 @@ export interface AnalysisResult {
   security: SecurityScanResult;
   activity: ActivityResult;
   packageAudit: PackageAuditResult;
+  devopsAudit: DevOpsAuditResult;
 }
 
 export interface AnalyzeResponse {

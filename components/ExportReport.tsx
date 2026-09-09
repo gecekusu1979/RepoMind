@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { AnalyzeResponse } from "@/types/repo";
 import { Download, Copy, Check } from "lucide-react";
@@ -81,7 +81,6 @@ function buildMarkdown(data: AnalyzeResponse): string {
         lines.push(``, `---`, ``);
     }
 
-    // Security
     if (security.findings.length > 0) {
         lines.push(`## 🔒 Güvenlik Bulguları`, ``);
         lines.push(`**Risk Seviyesi:** ${security.riskLevel}`, ``);
@@ -132,7 +131,6 @@ export function ExportReport({ data }: ExportReportProps) {
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         } catch {
-            // Fallback: select text approach
         }
     };
 

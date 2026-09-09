@@ -1,9 +1,8 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useRef } from "react";
 import { AnalyzeResponse } from "@/types/repo";
-import { MessageSquare, ShieldAlert, Cpu, Bot, User, Send, ChevronDown, CheckCircle2, ChevronUp } from "lucide-react";
-// Import dynamically from web-llm so it works client-side
+import { MessageSquare, ShieldAlert, Cpu, Bot, User, Send, ChevronDown, CheckCircle2 } from "lucide-react";
 import * as webllm from "@mlc-ai/web-llm";
 
 interface WebLLMChatProps {
@@ -15,7 +14,24 @@ interface ChatMessage {
     content: string;
 }
 
+type Persona = "architect" | "security" | "junior";
+
 const MODEL_ID = "Llama-3.2-1B-Instruct-q4f16_1-MLC"; // Universally supported fast model in latest web-llm
+
+const PERSONA_PROMPTS: Record<Persona, string> = {
+    architect:
+        "Rolün: Kıdemli Yazılım Mimarı. Katmanlar, bağımlılıklar ve mimari kararlar üzerine odaklan. Modülerlik, sorumlulukların ayrılması ve ölçeklenebilirlik sorunlarını vurgula.",
+    security:
+        "Rolün: AppSec ve Pentest Uzmanı. Güvenlik açıkları, lisans riskleri ve saldırı yüzeyine odaklan. Hardcoded secret, deprecated paket ve aşırı izinlere dikkat et.",
+    junior:
+        "Rolün: Yazılım Eğitmeni. Yeni başlayan bir geliştiriciye rehberlik et. Teknik kavramları sade ve anlaşılır örneklerle açıkla. Jargondan kaçın, adım adım rehberlik et.",
+};
+
+const PERSONA_UI: Record<Persona, { icon: string; label: string; color: string }> = {
+    architect: { icon: "🏛️", label: "Mimar", color: "text-violet-300 border-violet-500/40 bg-violet-500/10" },
+    security: { icon: "🛡️", label: "Güvenlik", color: "text-red-300 border-red-500/40 bg-red-500/10" },
+    junior: { icon: "🌱", label: "Junior", color: "text-emerald-300 border-emerald-500/40 bg-emerald-500/10" },
+};
 
 export function WebLLMChat({ data }: WebLLMChatProps) {
     const [open, setOpen] = useState(false);
@@ -25,17 +41,19 @@ export function WebLLMChat({ data }: WebLLMChatProps) {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
+    const [persona, setPersona] = useState<Persona>("architect");
     const bottomRef = useRef<HTMLDivElement>(null);
 
-    // Context payload (Deliberately truncated to prevent SmolLM2 hallucination/context overflow)
-    const systemPrompt = `Sen RepoMind asistanısın. Kısa ve öz Türkçe cevap ver.
+    const buildSystemPrompt = (p: Persona) =>
+        `${PERSONA_PROMPTS[p]}
+
+Sen RepoMind asistanısın. Kısa ve öz Türkçe cevap ver.
 Repo: ${data.meta.fullName} (${data.meta.language}, ${data.meta.stars} stars).
 Ana katmanlar: ${data.analysis.architecture.filter(a => a.name !== "Other").map(a => a.name).join(", ")}.
 Güvenlik/Uyarılar: ${data.analysis.security.findings.length} kural ihlali.
 Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanıtla.`;
 
     useEffect(() => {
-        // WebGPU validation
         if (typeof navigator !== "undefined" && "gpu" in navigator) {
             setSupported(true);
         } else {
@@ -52,7 +70,6 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
     const initEngine = async () => {
         if (engine || !supported) return;
         setLoading(true);
-        // Start engine
         try {
             const initProgressCallback = (report: webllm.InitProgressReport) => {
                 setProgress({
@@ -67,12 +84,10 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
 
             setEngine(mlcEngine);
             setMessages([
-                { role: "system", content: systemPrompt },
-                { role: "assistant", content: `Merhaba! ${data.meta.name} deposu için model başarıyla yüklendi. Sorularınızı sorabilirsiniz.` }
+                { role: "system", content: buildSystemPrompt(persona) },
+                { role: "assistant", content: `Merhaba! ${data.meta.name} deposu için model başarıyla yüklendi. Üst kısımdan perspektif seçebilir, ardından sorularınızı sorabilirsiniz.` }
             ]);
         } catch (e: any) {
-            // Next.js dev overlay intercepts console.error. 
-            // We use console.warn to elegantly fallback without locking the UI.
             console.warn("WebLLM başlatılamadı (Desteklenmeyen Donanım/WebGPU Kapalı).", e?.message);
             setSupported(false);
             setProgress({ text: "Model yüklenemedi. Tarayıcınızı güncelleyin veya donanım ivmesini açın.", step: -1 });
@@ -88,21 +103,31 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
         setOpen(!open);
     };
 
+    const handlePersonaChange = (p: Persona) => {
+        setPersona(p);
+        if (engine && messages.length > 0) {
+            setMessages((prev) => [
+                { role: "system", content: buildSystemPrompt(p) },
+                ...prev.filter((m) => m.role !== "system"),
+            ]);
+        }
+    };
+
     const handleSend = async (override?: string) => {
         const text = override ?? input;
         if (!text.trim() || !engine) return;
 
-        const newMessages = [...messages, { role: "user" as const, content: text.trim() }];
-        setMessages(newMessages);
+        const sysMsg: ChatMessage = { role: "system", content: buildSystemPrompt(persona) };
+        const historyWithoutSys = messages.filter((m) => m.role !== "system");
+        const newMessages = [...historyWithoutSys, { role: "user" as const, content: text.trim() }];
+        const fullMessages = [sysMsg, ...newMessages];
+
+        setMessages([...newMessages, { role: "assistant", content: "..." }]);
         setInput("");
         setLoading(true);
 
         try {
-            const tempMessages = [...newMessages, { role: "assistant" as const, content: "..." }];
-            setMessages(tempMessages);
-
-            // Map to the WebLLM interface
-            const req = newMessages.map(m => ({ role: m.role, content: m.content }));
+            const req = fullMessages.map(m => ({ role: m.role, content: m.content }));
 
             const reply = await engine.chat.completions.create({
                 messages: req,
@@ -118,11 +143,23 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
         }
     };
 
-    const QUICK_PROMPTS = [
-        "Bu projenin giriş noktası neresi?",
-        "Güvenlik açığı var mı?",
-        "Mimari nasıl tasarlanmış?"
-    ];
+    const QUICK_PROMPTS: Record<Persona, string[]> = {
+        architect: [
+            "Bu projenin giriş noktası neresi?",
+            "Mimari nasıl tasarlanmış?",
+            "Katmanlar arası bağımlılık ne durumda?",
+        ],
+        security: [
+            "Güvenlik açığı var mı?",
+            "Tehlikeli bağımlılıklar hangileri?",
+            "Saldırı yüzeyi nerededir?",
+        ],
+        junior: [
+            "Bu proje ne işe yarıyor?",
+            "Koda nereden başlamalıyım?",
+            "En önemli dosyalar hangileri?",
+        ],
+    };
 
     if (supported === false) {
         return (
@@ -141,7 +178,7 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
     return (
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
             {open && (
-                <div className="w-[360px] md:w-[400px] h-[550px] max-h-[80vh] flex flex-col bg-[#0b0b14] border border-white/10 rounded-2xl overflow-hidden shadow-2xl mb-4 animate-in slide-in-from-bottom-4 duration-300">
+                <div className="w-[360px] md:w-[420px] h-[600px] max-h-[85vh] flex flex-col bg-[#0b0b14] border border-white/10 rounded-2xl overflow-hidden shadow-2xl mb-4 animate-in slide-in-from-bottom-4 duration-300">
                     {/* Header */}
                     <div className="flex items-center justify-between p-4 bg-white/5 border-b border-white/10">
                         <div className="flex items-center gap-2">
@@ -158,6 +195,31 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
                         <button onClick={() => setOpen(false)} className="p-1 text-white/40 hover:text-white/80">
                             <ChevronDown className="w-5 h-5" />
                         </button>
+                    </div>
+
+                    {/* Persona Selector */}
+                    <div className="px-4 py-2.5 bg-white/[0.02] border-b border-white/[0.05] flex items-center gap-2">
+                        <span className="text-[10px] text-white/30 font-semibold uppercase tracking-wider flex-shrink-0">Perspektif:</span>
+                        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                            {(Object.keys(PERSONA_UI) as Persona[]).map((p) => {
+                                const ui = PERSONA_UI[p];
+                                const isActive = persona === p;
+                                return (
+                                    <button
+                                        key={p}
+                                        onClick={() => handlePersonaChange(p)}
+                                        className={`flex items-center gap-1 px-2.5 py-1 rounded-full border text-[11px] font-semibold transition-all whitespace-nowrap flex-shrink-0 ${isActive
+                                                ? ui.color
+                                                : "text-white/30 border-white/10 bg-transparent hover:bg-white/5 hover:text-white/50"
+                                            }`}
+                                    >
+                                        <span>{ui.icon}</span>
+                                        <span>{ui.label}</span>
+                                        {isActive && <CheckCircle2 className="w-2.5 h-2.5 ml-0.5" />}
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
 
                     {/* Chat Window */}
@@ -199,9 +261,9 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
                     </div>
 
                     {/* Quick Prompts */}
-                    {engine && messages.length <= 2 && (
+                    {engine && messages.filter(m => m.role !== "system").length <= 1 && (
                         <div className="px-4 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar border-t border-white/5 bg-zinc-950">
-                            {QUICK_PROMPTS.map(p => (
+                            {QUICK_PROMPTS[persona].map(p => (
                                 <button
                                     key={p}
                                     onClick={() => handleSend(p)}
@@ -245,6 +307,7 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
                 >
                     <MessageSquare className="w-5 h-5 flex-shrink-0" />
                     <span>Repo AI Asistanı</span>
+                    <span className="text-[10px] ml-1 opacity-60">{PERSONA_UI[persona].icon}</span>
                 </button>
             )}
         </div>

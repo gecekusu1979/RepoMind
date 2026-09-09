@@ -1,4 +1,4 @@
-import { AnalyzeResponse, CachedAnalysis, RecentRepo } from "@/types/repo";
+﻿import { AnalyzeResponse, CachedAnalysis, RecentRepo } from "@/types/repo";
 
 const CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes
 const CACHE_PREFIX = "repomind:analysis:";
@@ -9,9 +9,6 @@ function isBrowser(): boolean {
     return typeof window !== "undefined" && typeof localStorage !== "undefined";
 }
 
-// ─────────────────────────────────────────────────────────────────
-// Analysis Cache
-// ─────────────────────────────────────────────────────────────────
 
 export function getCached(fullName: string): AnalyzeResponse | null {
     if (!isBrowser()) return null;
@@ -36,7 +33,6 @@ export function setCached(fullName: string, data: AnalyzeResponse): void {
         localStorage.setItem(CACHE_PREFIX + fullName, JSON.stringify(entry));
         updateRecents(fullName, data);
     } catch {
-        // Silently ignore quota exceeded or serialization errors
     }
 }
 
@@ -45,7 +41,6 @@ export function clearCached(fullName: string): void {
     try {
         localStorage.removeItem(CACHE_PREFIX + fullName);
     } catch {
-        //
     }
 }
 
@@ -62,9 +57,6 @@ export function getCacheTTLRemaining(fullName: string): number | null {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────
-// Recent Repos History
-// ─────────────────────────────────────────────────────────────────
 
 function updateRecents(fullName: string, data: AnalyzeResponse): void {
     if (!isBrowser()) return;
@@ -80,7 +72,6 @@ function updateRecents(fullName: string, data: AnalyzeResponse): void {
         const updated = [entry, ...filtered].slice(0, MAX_RECENTS);
         localStorage.setItem(RECENTS_KEY, JSON.stringify(updated));
     } catch {
-        //
     }
 }
 
@@ -90,7 +81,6 @@ export function getRecents(): RecentRepo[] {
         const raw = localStorage.getItem(RECENTS_KEY);
         if (!raw) return [];
         const items: RecentRepo[] = JSON.parse(raw);
-        // Prune entries whose cache has expired
         return items.filter((r) => Date.now() - r.cachedAt < CACHE_TTL_MS);
     } catch {
         return [];
@@ -104,7 +94,6 @@ export function removeRecent(fullName: string): void {
         localStorage.setItem(RECENTS_KEY, JSON.stringify(updated));
         localStorage.removeItem(CACHE_PREFIX + fullName);
     } catch {
-        //
     }
 }
 

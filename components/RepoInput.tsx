@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, KeyboardEvent } from "react";
 import { Search, GitBranch, ArrowRight, Sparkles } from "lucide-react";

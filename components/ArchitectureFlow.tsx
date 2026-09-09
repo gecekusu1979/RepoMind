@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { ArchitectureBucket } from "@/types/repo";
 import { useEffect, useRef, useState, useId } from "react";
@@ -7,15 +7,17 @@ import { ZoomIn, ZoomOut, Expand } from "lucide-react";
 
 interface ArchitectureFlowProps {
     buckets: ArchitectureBucket[];
+    onLayerSelect?: (layer: string | null) => void;
+    selectedLayer?: string | null;
 }
 
-export function ArchitectureFlow({ buckets }: ArchitectureFlowProps) {
+export function ArchitectureFlow({ buckets, onLayerSelect, selectedLayer }: ArchitectureFlowProps) {
     const id = useId().replace(/:/g, ""); // Safe id for mermaid
     const [svg, setSvg] = useState<string | null>(null);
     const [error, setError] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
+    const svgRef = useRef<HTMLDivElement>(null);
 
-    // Scale for pan/zoom
     const [scale, setScale] = useState(1);
 
     useEffect(() => {
@@ -25,7 +27,7 @@ export function ArchitectureFlow({ buckets }: ArchitectureFlowProps) {
                     startOnLoad: false,
                     theme: "dark",
                     fontFamily: "inherit",
-                    securityLevel: "strict",
+                    securityLevel: "loose", // Must be loose to allow click handlers
                     flowchart: { curve: "basis" }
                 });
 
@@ -33,11 +35,9 @@ export function ArchitectureFlow({ buckets }: ArchitectureFlowProps) {
                 if (activeBuckets.length === 0) return;
 
                 let code = "graph TD\n";
-                // Node definition
                 activeBuckets.forEach(b => {
                     const safeName = b.name.replace(/[^a-zA-Z]/g, '');
                     code += `  ${safeName}["${b.icon} ${b.name}<br/>(${b.paths.length} dosya)"]\n`;
-                    // Basic edges based on architecture
                     if (b.name === "Frontend" && activeBuckets.some(x => x.name === "Backend")) {
                         code += `  ${safeName} --> Backend\n`;
                     }
@@ -53,7 +53,6 @@ export function ArchitectureFlow({ buckets }: ArchitectureFlowProps) {
                 const uniqueId = `mermaid-svg-${id}-${Date.now()}`;
                 const { svg: drawnSvg } = await mermaid.render(uniqueId, code);
 
-                // Inject SVG directly
                 setSvg(drawnSvg);
             } catch (e) {
                 console.error("Mermaid render error", e);
@@ -64,6 +63,45 @@ export function ArchitectureFlow({ buckets }: ArchitectureFlowProps) {
         renderGraph();
     }, [buckets, id]);
 
+    useEffect(() => {
+        if (!svg || !svgRef.current || !onLayerSelect) return;
+
+        const container = svgRef.current;
+        const nodes = container.querySelectorAll<SVGGElement>("g.node");
+
+        const handlers: { el: SVGGElement; handler: EventListener }[] = [];
+
+        nodes.forEach((node) => {
+            const textEl = node.querySelector("text, span, foreignObject");
+            const rawText = textEl?.textContent ?? "";
+
+            const matched = buckets.find((b) => {
+                const safeName = b.name.replace(/[^a-zA-Z]/g, "");
+                return node.id?.includes(safeName) || rawText.includes(b.name) || rawText.includes(b.icon);
+            });
+
+            if (!matched) return;
+
+            const bucketName = matched.name;
+
+            const isActive = selectedLayer === bucketName;
+            node.style.cursor = "pointer";
+            node.style.outline = isActive ? "2px solid #6366f1" : "";
+            node.style.borderRadius = "6px";
+
+            const handler: EventListener = () => {
+                onLayerSelect(selectedLayer === bucketName ? null : bucketName);
+            };
+
+            node.addEventListener("click", handler);
+            handlers.push({ el: node, handler });
+        });
+
+        return () => {
+            handlers.forEach(({ el, handler }) => el.removeEventListener("click", handler));
+        };
+    }, [svg, buckets, onLayerSelect, selectedLayer]);
+
     if (error) return null;
 
     if (!svg) {
@@ -72,6 +110,7 @@ export function ArchitectureFlow({ buckets }: ArchitectureFlowProps) {
 
     return (
         <div className="rounded-2xl border bg-zinc-950 border-white/10 overflow-hidden relative">
+            {/* Controls */}
             <div className="absolute top-3 right-3 flex items-center gap-1 bg-white/5 border border-white/10 rounded-lg p-1 z-10">
                 <button onClick={() => setScale(s => Math.min(2, s + 0.1))} className="p-1 hover:bg-white/10 rounded text-white/50 hover:text-white/80 transition-colors">
                     <ZoomIn className="w-4 h-4" />
@@ -84,12 +123,21 @@ export function ArchitectureFlow({ buckets }: ArchitectureFlowProps) {
                 </button>
             </div>
 
+            {/* Active filter hint */}
+            {selectedLayer && (
+                <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-2.5 py-1 bg-indigo-500/20 border border-indigo-500/40 rounded-full text-xs text-indigo-300 font-semibold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+                    {selectedLayer} seçili
+                </div>
+            )}
+
             <div
                 ref={containerRef}
                 className="p-4 w-full h-[340px] overflow-auto flex items-center justify-center"
                 style={{ cursor: "grab" }}
             >
                 <div
+                    ref={svgRef}
                     dangerouslySetInnerHTML={{ __html: svg }}
                     style={{
                         transform: `scale(${scale})`,

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useCallback } from "react";
 import { AnalyzeResponse } from "@/types/repo";
@@ -11,16 +11,16 @@ import { ExplainDrawer } from "@/components/ExplainDrawer";
 import { LanguageBar } from "@/components/LanguageBar";
 import { TreemapVisualizer } from "@/components/TreemapVisualizer";
 import { SecurityCard } from "@/components/SecurityCard";
-import { ExportReport } from "@/components/ExportReport";
+import { ExportReportModal } from "@/components/ExportReportModal";
 import { RecentRepos } from "@/components/RecentRepos";
 import { BusFactorCard } from "@/components/BusFactorCard";
 import { GoodFirstIssues } from "@/components/GoodFirstIssues";
 import { PackageAuditCard } from "@/components/PackageAuditCard";
+import { DevOpsHealthCard } from "@/components/DevOpsHealthCard";
 import { getCached, setCached } from "@/lib/cache";
 import { AlertCircle, GitBranch, Zap, Code2, Shield, BarChart3, GitCompare } from "lucide-react";
 import dynamic from "next/dynamic";
 
-// Dynamically import heavy/browser-only components
 const ArchitectureFlow = dynamic(() => import("@/components/ArchitectureFlow").then(m => m.ArchitectureFlow), { ssr: false });
 const WebLLMChat = dynamic(() => import("@/components/WebLLMChat").then(m => m.WebLLMChat), { ssr: false });
 
@@ -34,9 +34,11 @@ type AppState =
 export default function Home() {
   const [state, setState] = useState<AppState>({ status: 'idle' });
   const [currentRepo, setCurrentRepo] = useState<string | undefined>();
+  const [selectedLayer, setSelectedLayer] = useState<string | null>(null);
 
   const runAnalysis = useCallback(async (url: string) => {
     setState({ status: "loading" });
+    setSelectedLayer(null);
 
     try {
       const res = await fetch("/api/analyze", {
@@ -65,7 +67,6 @@ export default function Home() {
   }, []);
 
   const handleAnalyze = useCallback(async (url: string) => {
-    // Normalize short form owner/repo → fullName check
     const normalized = url.trim().replace(/\.git$/, "");
     const match = normalized.match(/github\.com[/:]([^/]+)\/([^/]+)/) ??
       normalized.match(/^([^/]+)\/([^/]+)$/);
@@ -75,6 +76,7 @@ export default function Home() {
       if (cached) {
         setState({ status: "success", data: cached });
         setCurrentRepo(fullName);
+        setSelectedLayer(null);
         return;
       }
     }
@@ -86,6 +88,7 @@ export default function Home() {
     if (cached) {
       setState({ status: "success", data: cached });
       setCurrentRepo(fullName);
+      setSelectedLayer(null);
     } else {
       runAnalysis(`https://github.com/${fullName}`);
     }
@@ -211,8 +214,8 @@ export default function Home() {
                     activity={state.data.analysis.activity}
                   />
                 </div>
-                {/* Export buttons */}
-                <ExportReport data={state.data} />
+                {/* Feature 1: Enhanced Export Modal */}
+                <ExportReportModal data={state.data} />
               </div>
             </div>
 
@@ -224,7 +227,12 @@ export default function Home() {
                   <ArchitectureTree buckets={state.data.analysis.architecture} />
                 </div>
 
-                <ArchitectureFlow buckets={state.data.analysis.architecture} />
+                {/* Feature 4: Cross-filter enabled Mermaid diagram */}
+                <ArchitectureFlow
+                  buckets={state.data.analysis.architecture}
+                  onLayerSelect={setSelectedLayer}
+                  selectedLayer={selectedLayer}
+                />
 
                 {state.data.analysis.topLanguages.length > 0 && (
                   <div className="p-5 bg-white/[0.03] border border-white/10 rounded-2xl">
@@ -232,16 +240,26 @@ export default function Home() {
                   </div>
                 )}
 
-                {/* Treemap Visualizer */}
+                {/* Feature 4: Cross-filter enabled Treemap */}
                 <div className="p-5 bg-white/[0.03] border border-white/10 rounded-2xl">
-                  <TreemapVisualizer files={state.data.analysis.architecture.flatMap((b) =>
-                    b.paths.map((p) => ({
-                      path: p,
-                      type: "blob" as const,
-                      size: undefined,
-                    }))
-                  )} />
+                  <TreemapVisualizer
+                    files={state.data.analysis.architecture.flatMap((b) =>
+                      b.paths.map((p) => ({
+                        path: p,
+                        type: "blob" as const,
+                        size: undefined,
+                      }))
+                    )}
+                    selectedLayer={selectedLayer}
+                    onClearFilter={() => setSelectedLayer(null)}
+                    buckets={state.data.analysis.architecture}
+                  />
                 </div>
+
+                {/* Feature 2: DevOps Health Card */}
+                {state.data.analysis.devopsAudit && (
+                  <DevOpsHealthCard audit={state.data.analysis.devopsAudit} />
+                )}
 
                 {/* Dependencies */}
                 {state.data.analysis.dependencies.length > 0 && (
@@ -326,7 +344,7 @@ export default function Home() {
               />
             </div>
 
-            {/* AI Explain & WebLLM Chat */}
+            {/* AI Explain & WebLLM Chat (Feature 5: Persona Selector) */}
             <ExplainDrawer data={state.data} />
             <WebLLMChat data={state.data} />
           </section>

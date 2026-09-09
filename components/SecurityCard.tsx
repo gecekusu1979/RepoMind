@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { SecurityScanResult } from "@/types/repo";
 import { Shield, ShieldAlert, ShieldCheck, ChevronDown, ChevronUp } from "lucide-react";

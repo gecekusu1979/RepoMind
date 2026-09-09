@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { GitHubIssue, RepoMeta } from "@/types/repo";
@@ -35,7 +35,6 @@ export function GoodFirstIssues({ meta }: GoodFirstIssuesProps) {
     }, [meta.owner, meta.name]);
 
     useEffect(() => {
-        // IntersectionObserver for rate-limit protection (Lazy load)
         const observer = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting) {

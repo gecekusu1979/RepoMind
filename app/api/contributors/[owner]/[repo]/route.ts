@@ -32,7 +32,7 @@ export async function GET(
         if (!res.ok) {
             return NextResponse.json(
                 { error: "Katkıda bulunanlar alınamadı." },
-                { status: res.status }
+                { status: res.status === 404 ? 404 : res.status === 403 ? 403 : 502 }
             );
         }
 

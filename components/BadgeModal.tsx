@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X, Check, Copy, Shield, Code, Link2 } from "lucide-react";
@@ -67,7 +67,6 @@ export default function BadgeModal({ isOpen, onClose, owner, repo }: BadgeModalP
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         } catch {
-            // Fallback
         }
     };
 

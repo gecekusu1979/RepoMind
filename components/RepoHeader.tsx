@@ -1,9 +1,10 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { RepoMeta, ActivityResult } from "@/types/repo";
 import { Star, GitFork, ExternalLink, Globe, AlertCircle, Calendar, Shield } from "lucide-react";
 import BadgeModal from "@/components/BadgeModal";
+import { RepoPulseBadge } from "@/components/RepoPulseBadge";
 
 interface RepoHeaderProps {
     meta: RepoMeta;
@@ -123,6 +124,9 @@ export function RepoHeader({ meta, totalFiles, truncated, activity }: RepoHeader
                     </a>
                 )}
             </div>
+
+            {/* Commit pulse badge (lazy-loaded via IntersectionObserver) */}
+            <RepoPulseBadge owner={meta.owner} repo={meta.name} />
 
             {/* Truncation warning */}
             {truncated && (
