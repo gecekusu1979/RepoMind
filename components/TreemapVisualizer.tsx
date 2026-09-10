@@ -249,6 +249,7 @@ export const TreemapVisualizer = React.memo(function TreemapVisualizer({
             <div className="w-full rounded-xl overflow-hidden border border-white/5" style={{ height: 340 }}>
                 <ResponsiveContainer width="100%" height="100%">
                     <Treemap
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         data={flatData as any}
                         dataKey="value"
                         nameKey="name"

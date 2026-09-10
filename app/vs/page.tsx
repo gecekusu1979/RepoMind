@@ -2,15 +2,9 @@
 
 import { useState, useCallback } from "react";
 import Link from "next/link";
-import { AnalyzeResponse, AnalysisResult } from "@/types/repo";
+import { AnalyzeResponse } from "@/types/repo";
 import { ScoreCard } from "@/components/ScoreCard";
 import { Star, GitFork, Files, ExternalLink } from "lucide-react";
-
-interface CompareCardProps {
-    data: AnalyzeResponse | null;
-    loading: boolean;
-    winner: (metric: keyof AnalysisResult["metrics"] | "totalFiles" | "stars") => boolean;
-}
 
 function formatStars(n: number): string {
     if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -186,15 +180,6 @@ export default function VsPage() {
     const loadDemo = (pair: [string, string]) => {
         setUrlA(pair[0]);
         setUrlB(pair[1]);
-    };
-
-    const winnerOf = (getVal: (d: AnalyzeResponse) => number, higherIsBetter = true) => {
-        if (!dataA || !dataB) return { a: false, b: false };
-        const a = getVal(dataA);
-        const b = getVal(dataB);
-        if (a === b) return { a: false, b: false };
-        const aWins = higherIsBetter ? a > b : a < b;
-        return { a: aWins, b: !aWins };
     };
 
     return (

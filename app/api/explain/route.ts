@@ -4,13 +4,6 @@ import { AnalyzeResponse, ArchitectureBucket } from "@/types/repo";
 export const runtime = "edge";
 
 
-function formatScore(score: number): string {
-    if (score >= 80) return `**${score}/100** ✅ (Mükemmel)`;
-    if (score >= 60) return `**${score}/100** 🟡 (İyi)`;
-    if (score >= 40) return `**${score}/100** 🟠 (Orta)`;
-    return `**${score}/100** 🔴 (Zayıf)`;
-}
-
 function formatSize(kb: number): string {
     if (kb >= 1024 * 1024) return `${(kb / 1024 / 1024).toFixed(1)} GB`;
     if (kb >= 1024) return `${(kb / 1024).toFixed(1)} MB`;

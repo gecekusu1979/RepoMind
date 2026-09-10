@@ -1,7 +1,7 @@
 ﻿"use client";
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { X, Check, Copy, Shield, Code, Link2 } from "lucide-react";
+import { X, Check, Copy, Shield } from "lucide-react";
 
 interface BadgeModalProps {
     isOpen: boolean;
@@ -27,12 +27,8 @@ export default function BadgeModal({ isOpen, onClose, owner, repo }: BadgeModalP
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        // Portal render'ı SSR/hydration mismatch olmadan yalnızca client'ta
-        // yapmak için standart "mounted" tespiti — bilinçli bir istisna.
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
         if (typeof window !== "undefined") {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
             setOrigin(window.location.origin);
         }
     }, []);

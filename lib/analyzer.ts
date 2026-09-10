@@ -125,9 +125,7 @@ export function analyzeRepo(
         const extParts = lowerBase.split(".");
         const ext = extParts.length > 1 ? extParts[extParts.length - 1] : "";
 
-        let isConfig = false;
         let isTest = false;
-        let isInfra = false;
 
         if (CODE_EXTS.has(ext)) {
             codeFilesCount++;
@@ -165,7 +163,6 @@ export function analyzeRepo(
             bucket = "Tests";
         } else if (CONFIG_DIRS.has(checkDir) || LINTER_CONFIGS.has(lowerBase)) {
             bucket = "Config";
-            isConfig = true;
         } else if (FRONTEND_DIRS.has(checkDir)) {
             bucket = "Frontend";
         } else if (BACKEND_DIRS.has(checkDir)) {
@@ -174,7 +171,6 @@ export function analyzeRepo(
             bucket = "Database";
         } else if (INFRA_DIRS.has(checkDir) || lowerBase.includes("docker") || path.includes(".github/workflows")) {
             bucket = "Infra/DevOps";
-            isInfra = true;
         }
 
         if (archMap[bucket].length < 3) {

@@ -3,8 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { BusFactorResult, RepoMeta } from "@/types/repo";
 import { calculateBusFactor } from "@/lib/contributors";
-import { Users, AlertOctagon, CheckCircle2, AlertTriangle, ExternalLink } from "lucide-react";
-import Image from "next/image";
+import { Users, AlertOctagon, CheckCircle2, AlertTriangle } from "lucide-react";
 
 interface BusFactorCardProps {
     meta: RepoMeta;
