@@ -10,7 +10,7 @@
 
 **RepoMind**, herhangi bir açık kaynak GitHub deposunun mimarisini, kod sağlığını, bağımlılık risklerini ve sürdürülebilirliğini **depoyu yerel makinenize klonlamadan** saniyeler içinde analiz eden modern bir geliştirici aracıdır.
 
-Dışarıdan zorunlu bir LLM veya GitHub API anahtarına ihtiyaç duymaz; analizleri GitHub Tree API ve kural tabanlı algoritmalarla yerel olarak yürütür, yapay zekayı ise **WebGPU (WebLLM)** aracılığıyla doğrudan kullanıcının tarayıcısında çalıştırır.
+Dışarıdan zorunlu bir LLM veya GitHub API anahtarına ihtiyaç duymaz; analizleri GitHub Tree API ve kural tabanlı algoritmalarla yerel olarak yürütür, yapay zekayı ise **WebGPU (WebLLM)** aracılığıyla doğrudan kullanıcının tarayıcısında çalıştırır
 
 ---
 
