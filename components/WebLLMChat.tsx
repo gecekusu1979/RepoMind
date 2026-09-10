@@ -54,7 +54,10 @@ Güvenlik/Uyarılar: ${data.analysis.security.findings.length} kural ihlali.
 Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanıtla.`;
 
     useEffect(() => {
+        // navigator sadece client'ta var; WebGPU desteğini SSR ile
+        // hydration mismatch yaşamadan tespit etmek için effect kullanılıyor.
         if (typeof navigator !== "undefined" && "gpu" in navigator) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setSupported(true);
         } else {
             setSupported(false);
@@ -87,8 +90,9 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
                 { role: "system", content: buildSystemPrompt(persona) },
                 { role: "assistant", content: `Merhaba! ${data.meta.name} deposu için model başarıyla yüklendi. Üst kısımdan perspektif seçebilir, ardından sorularınızı sorabilirsiniz.` }
             ]);
-        } catch (e: any) {
-            console.warn("WebLLM başlatılamadı (Desteklenmeyen Donanım/WebGPU Kapalı).", e?.message);
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : undefined;
+            console.warn("WebLLM başlatılamadı (Desteklenmeyen Donanım/WebGPU Kapalı).", message);
             setSupported(false);
             setProgress({ text: "Model yüklenemedi. Tarayıcınızı güncelleyin veya donanım ivmesini açın.", step: -1 });
         } finally {

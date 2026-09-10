@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { fetchRepoMeta, fetchFileTree, fetchCriticalFiles, isValidGitHubSlug } from "@/lib/github";
 import { analyzeRepo } from "@/lib/analyzer";
+import { checkRateLimit, rateLimitHeaders } from "@/lib/rateLimit";
 
 export const runtime = "edge";
 
@@ -47,6 +48,22 @@ export async function GET(
     req: NextRequest,
     { params }: { params: Promise<{ owner: string; repo: string }> }
 ) {
+    // Badge'ler README'ler üzerinden dolaylı olarak birçok ziyaretçi tarafından
+    // istenebildiği için diğer uçlara göre daha yüksek bir limit kullanıyoruz;
+    // ayrıca yanıt tipini korumak için 429'da da SVG döndürüyoruz.
+    const rate = checkRateLimit(req, "badge", 60, 60_000);
+    if (!rate.ok) {
+        const limitSvg = buildSvg("RepoMind", "limit aşıldı", "#6b7280");
+        return new Response(limitSvg, {
+            status: 429,
+            headers: {
+                "Content-Type": "image/svg+xml",
+                "Cache-Control": "no-cache",
+                ...rateLimitHeaders(rate),
+            },
+        });
+    }
+
     const { owner, repo } = await params;
 
     if (!isValidGitHubSlug(owner) || !isValidGitHubSlug(repo)) {

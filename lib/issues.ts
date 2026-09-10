@@ -25,7 +25,18 @@ export function formatTimeAgo(dateString: string): string {
     return `${Math.floor(diffInSeconds / YEAR)} yıl önce`;
 }
 
-export function processIssues(rawIssues: any[]): GitHubIssue[] {
+interface RawGitHubIssue {
+    id: number;
+    number: number;
+    title: string;
+    html_url: string;
+    comments: number;
+    created_at: string;
+    pull_request?: unknown;
+    user?: { login?: string } | null;
+}
+
+export function processIssues(rawIssues: RawGitHubIssue[]): GitHubIssue[] {
     const pureIssues = rawIssues.filter(i => !i.pull_request);
 
     return pureIssues.map(i => ({

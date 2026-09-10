@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isValidGitHubSlug } from "@/lib/github";
+import { checkRateLimit, rateLimitHeaders } from "@/lib/rateLimit";
 
 export const runtime = "edge";
 
@@ -7,6 +8,14 @@ export async function GET(
     req: NextRequest,
     { params }: { params: Promise<{ owner: string; repo: string }> }
 ) {
+    const rate = checkRateLimit(req, "contributors", 30, 60_000);
+    if (!rate.ok) {
+        return NextResponse.json(
+            { error: "Çok fazla istek gönderildi. Lütfen bir süre sonra tekrar deneyin." },
+            { status: 429, headers: rateLimitHeaders(rate) }
+        );
+    }
+
     const { owner, repo } = await params;
 
     if (!isValidGitHubSlug(owner) || !isValidGitHubSlug(repo)) {

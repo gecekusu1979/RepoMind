@@ -56,7 +56,7 @@ export function GoodFirstIssues({ meta }: GoodFirstIssuesProps) {
         <div ref={containerRef} className="rounded-2xl border bg-white/[0.03] border-white/10 overflow-hidden p-5 flex flex-col h-full">
             <div className="flex items-center gap-2 mb-4">
                 <HeartHandshake className="w-5 h-5 text-emerald-400" />
-                <h3 className="text-sm font-semibold text-white/80">Yeni Başlayanlar İçin Issue'lar</h3>
+                <h3 className="text-sm font-semibold text-white/80">Yeni Başlayanlar İçin Issue&apos;lar</h3>
             </div>
 
             {loading && (
@@ -109,7 +109,7 @@ export function GoodFirstIssues({ meta }: GoodFirstIssuesProps) {
                         <Activity className="w-5 h-5 text-emerald-400" />
                     </div>
                     <p className="text-sm font-semibold text-emerald-400 mb-1">Harika Haber!</p>
-                    <p className="text-xs text-white/50 max-w-[200px]">Şu an açık 'good first issue' bulunmuyor var olanların çoğu çözülmüş.</p>
+                    <p className="text-xs text-white/50 max-w-[200px]">Şu an açık &apos;good first issue&apos; bulunmuyor var olanların çoğu çözülmüş.</p>
                 </div>
             )}
         </div>

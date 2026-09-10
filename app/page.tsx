@@ -57,11 +57,12 @@ export default function Home() {
       setState({ status: "success", data: result });
       setCurrentRepo(result.meta.fullName);
       setCached(result.meta.fullName, result);
-    } catch (e: any) {
-      if (e.message?.includes("403") || e.message?.includes("API rate limit")) {
-        setState({ status: "rate-limited", error: e.message });
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Beklenmedik bir hata oluştu.";
+      if (message.includes("403") || message.includes("API rate limit")) {
+        setState({ status: "rate-limited", error: message });
       } else {
-        setState({ status: "error", error: e instanceof Error ? e.message : "Beklenmedik bir hata oluştu." });
+        setState({ status: "error", error: message });
       }
     }
   }, []);
@@ -136,7 +137,7 @@ export default function Home() {
               saniyeler içinde anlayın
             </h1>
             <p className="text-white/50 text-base md:text-lg max-w-xl leading-relaxed">
-              Heuristik analiz + AI açıklamaları. Klonlama yok. Sadece GitHub URL'si.
+              Heuristik analiz + AI açıklamaları. Klonlama yok. Sadece GitHub URL&apos;si.
             </p>
 
             {/* Feature pills */}
@@ -306,7 +307,7 @@ export default function Home() {
                 {/* Badge URL card */}
                 <div className="p-4 bg-white/[0.03] border border-white/10 rounded-2xl space-y-2">
                   <h3 className="text-xs font-semibold text-white/30 uppercase tracking-widest">
-                    Rozet URL'leri
+                    Rozet URL&apos;leri
                   </h3>
                   <div className="space-y-1.5">
                     {(["health", "test", "doc"] as const).map((metric) => {

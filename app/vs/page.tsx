@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useState, useCallback } from "react";
+import Link from "next/link";
 import { AnalyzeResponse, AnalysisResult } from "@/types/repo";
 import { ScoreCard } from "@/components/ScoreCard";
 import { Star, GitFork, Files, ExternalLink } from "lucide-react";
@@ -17,25 +18,27 @@ function formatStars(n: number): string {
     return n.toString();
 }
 
+function MetricCell({ val, wins }: { val: number | null; wins: boolean }) {
+    return (
+        <td className={`text-center py-2 px-3 text-sm font-semibold rounded-lg transition-colors
+      ${wins ? "text-emerald-400 bg-emerald-500/10" : "text-white/60"}`}>
+            {val === null ? "—" : val}
+        </td>
+    );
+}
+
 function MetricRow({
     label, a, b, higherIsBetter = true
 }: { label: string; a: number | null; b: number | null; higherIsBetter?: boolean }) {
     const aWins = a !== null && b !== null && (higherIsBetter ? a > b : a < b);
     const bWins = a !== null && b !== null && (higherIsBetter ? b > a : b < a);
 
-    const Cell = ({ val, wins }: { val: number | null; wins: boolean }) => (
-        <td className={`text-center py-2 px-3 text-sm font-semibold rounded-lg transition-colors
-      ${wins ? "text-emerald-400 bg-emerald-500/10" : "text-white/60"}`}>
-            {val === null ? "—" : val}
-        </td>
-    );
-
     return (
         <tr className="border-t border-white/5">
             <td className="py-2 px-3 text-xs text-white/40 font-medium">{label}</td>
-            <Cell val={a} wins={aWins} />
+            <MetricCell val={a} wins={aWins} />
             <td className="py-2 px-3 text-xs text-white/20 text-center">vs</td>
-            <Cell val={b} wins={bWins} />
+            <MetricCell val={b} wins={bWins} />
         </tr>
     );
 }
@@ -199,12 +202,12 @@ export default function VsPage() {
             {/* Header */}
             <div className="border-b border-white/5 bg-white/[0.02]">
                 <div className="max-w-7xl mx-auto px-4 py-4 flex items-center gap-4">
-                    <a href="/" className="flex items-center gap-2 group">
+                    <Link href="/" className="flex items-center gap-2 group">
                         <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-violet-500 to-blue-600 flex items-center justify-center shadow-lg shadow-violet-500/25">
                             <span className="text-xs font-bold text-white">R</span>
                         </div>
                         <span className="text-sm font-bold text-white/60 group-hover:text-white transition-colors">RepoMind</span>
-                    </a>
+                    </Link>
                     <span className="text-white/20">/</span>
                     <span className="text-sm font-semibold text-white/80">⚡ Karşılaştır</span>
                 </div>

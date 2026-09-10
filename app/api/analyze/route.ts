@@ -7,12 +7,21 @@ import {
 } from "@/lib/github";
 import { analyzeRepo } from "@/lib/analyzer";
 import { runDevopsLinter } from "@/lib/devopsLinter";
+import { checkRateLimit, rateLimitHeaders } from "@/lib/rateLimit";
 
 export const runtime = "edge";
 
 const MAX_URL_LENGTH = 256;
 
 export async function POST(req: NextRequest) {
+    const rate = checkRateLimit(req, "analyze", 20, 60_000);
+    if (!rate.ok) {
+        return NextResponse.json(
+            { error: "Çok fazla istek gönderildi. Lütfen bir süre sonra tekrar deneyin." },
+            { status: 429, headers: rateLimitHeaders(rate) }
+        );
+    }
+
     try {
         const contentType = req.headers.get("content-type") ?? "";
         if (!contentType.includes("application/json")) {
@@ -83,7 +92,10 @@ export async function POST(req: NextRequest) {
 
         const analysis = analyzeRepo(items, readme, packageJson, truncated, meta);
 
-        return NextResponse.json({ meta, analysis: { ...analysis, devopsAudit } });
+        return NextResponse.json(
+            { meta, analysis: { ...analysis, devopsAudit } },
+            { headers: rateLimitHeaders(rate) }
+        );
     } catch (e: unknown) {
         const msg =
             e instanceof Error ? e.message : "Sunucu hatası oluştu.";

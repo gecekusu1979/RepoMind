@@ -27,6 +27,9 @@ export function RecentRepos({ onSelect, currentRepo }: RecentReposProps) {
     const [ttls, setTtls] = useState<Record<string, number>>({});
 
     useEffect(() => {
+        // localStorage sadece client'ta var; SSR ile hydration mismatch
+        // yaşamamak için bilinçli olarak effect içinde okunuyor.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setRecents(getRecents());
     }, []);
 

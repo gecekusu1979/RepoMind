@@ -2,7 +2,6 @@
     FileTreeItem,
     AnalysisResult,
     ArchitectureBucket,
-    MetricScores,
     RepoMeta,
 } from "@/types/repo";
 import { runSecurityScan } from "@/lib/securityScanner";
@@ -75,8 +74,8 @@ export function analyzeRepo(
     let codeFilesCount = 0;
     let testFilesCount = 0;
 
-    let hasReadme = !!readme;
-    let readmeLength = readme ? readme.length : 0;
+    const hasReadme = !!readme;
+    const readmeLength = readme ? readme.length : 0;
     let hasLicense = false;
     let hasContributing = false;
     let hasChangelog = false;
