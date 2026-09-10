@@ -122,6 +122,7 @@ export function BusFactorCard({ meta }: BusFactorCardProps) {
                                 rel="noopener noreferrer"
                                 className="group relative"
                             >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                     src={c.avatar_url}
                                     alt={c.login}

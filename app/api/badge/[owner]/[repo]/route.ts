@@ -101,7 +101,7 @@ export async function GET(
                 "X-Content-Type-Options": "nosniff",
             },
         });
-    } catch (e: unknown) {
+    } catch (_e: unknown) {
         const errorSvg = buildSvg("RepoMind", "hata", "#6b7280");
         return new Response(errorSvg, {
             headers: {

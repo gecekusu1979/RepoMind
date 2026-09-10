@@ -27,8 +27,10 @@ export default function BadgeModal({ isOpen, onClose, owner, repo }: BadgeModalP
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
         if (typeof window !== "undefined") {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setOrigin(window.location.origin);
         }
     }, []);
