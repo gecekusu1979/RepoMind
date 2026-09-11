@@ -126,19 +126,28 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
         const newMessages = [...historyWithoutSys, { role: "user" as const, content: text.trim() }];
         const fullMessages = [sysMsg, ...newMessages];
 
-        setMessages([...newMessages, { role: "assistant", content: "..." }]);
+        setMessages([...newMessages, { role: "assistant", content: "" }]);
         setInput("");
         setLoading(true);
 
         try {
             const req = fullMessages.map(m => ({ role: m.role, content: m.content }));
 
-            const reply = await engine.chat.completions.create({
+            const chunks = await engine.chat.completions.create({
                 messages: req,
-            });
+                stream: true,
+            }) as AsyncIterable<webllm.ChatCompletionChunk>;
 
-            const content = reply.choices[0].message.content || "Cevap üretilemedi.";
-            setMessages([...newMessages, { role: "assistant", content }]);
+            let currentReply = "";
+            for await (const chunk of chunks) {
+                const delta = chunk.choices[0]?.delta?.content || "";
+                currentReply += delta;
+                setMessages([...newMessages, { role: "assistant", content: currentReply }]);
+            }
+
+            if (!currentReply) {
+                setMessages([...newMessages, { role: "assistant", content: "Cevap üretilemedi." }]);
+            }
         } catch (e) {
             console.error(e);
             setMessages([...newMessages, { role: "assistant", content: "Kritik bir hata oluştu." }]);
@@ -213,8 +222,8 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
                                         key={p}
                                         onClick={() => handlePersonaChange(p)}
                                         className={`flex items-center gap-1 px-2.5 py-1 rounded-full border text-[11px] font-semibold transition-all whitespace-nowrap flex-shrink-0 ${isActive
-                                                ? ui.color
-                                                : "text-white/30 border-white/10 bg-transparent hover:bg-white/5 hover:text-white/50"
+                                            ? ui.color
+                                            : "text-white/30 border-white/10 bg-transparent hover:bg-white/5 hover:text-white/50"
                                             }`}
                                     >
                                         <span>{ui.icon}</span>

@@ -93,6 +93,9 @@ export function analyzeRepo(
     const archMap: Record<ArchitectureBucket["name"], string[]> = {
         Frontend: [], Backend: [], Database: [], "Infra/DevOps": [], Tests: [], Config: [], Other: []
     };
+    const archCount: Record<ArchitectureBucket["name"], number> = {
+        Frontend: 0, Backend: 0, Database: 0, "Infra/DevOps": 0, Tests: 0, Config: 0, Other: 0
+    };
 
     const langCounts: Record<string, number> = {};
     const problems: string[] = [];
@@ -173,7 +176,8 @@ export function analyzeRepo(
             bucket = "Infra/DevOps";
         }
 
-        if (archMap[bucket].length < 3) {
+        archCount[bucket]++;
+        if (archMap[bucket].length < 8) {
             archMap[bucket].push(path);
         }
     }
@@ -192,20 +196,22 @@ export function analyzeRepo(
     if (hasChangelog) docScore += 15;
     docScore = Math.min(100, docScore);
 
-    let healthScore = 60;
-    if (hasGitIgnore) healthScore += 10;
-    if (hasLinter) healthScore += 10;
-    if (hasTypeConfig) healthScore += 10;
-    if (hasLockfile) healthScore += 10;
-    if (hasCiCd) healthScore += 10;
+    // Sıfır tabanlı healthScore: her kriter pozitif katkı sağlar
+    let healthScore = 0;
+    if (hasGitIgnore) healthScore += 15;  // .gitignore temel hijyeni
+    if (hasLinter) healthScore += 15;     // kod standardı
+    if (hasTypeConfig) healthScore += 15; // statik tipleme
+    if (hasLockfile) healthScore += 15;   // deterministik bağımlılık
+    if (hasCiCd) healthScore += 20;       // otomasyon
+    if (hasIaC) healthScore += 10;        // konteyner/altyapı
+    if (hasReadme) healthScore += 10;     // temel dokümantasyon
 
     if (problems.some(p => p.includes("Kritik sır"))) {
-        healthScore -= 30; // Severe (.env) leak penalty
+        healthScore = Math.max(0, healthScore - 40); // Kritik: .env sızıntısı
     }
 
-    const maxNestingPenalty = maxDepth > 6 ? 15 : 0;
-    healthScore -= maxNestingPenalty;
-    healthScore = Math.max(0, Math.min(100, healthScore));
+    const maxNestingPenalty = maxDepth > 7 ? 10 : maxDepth > 6 ? 5 : 0;
+    healthScore = Math.max(0, Math.min(100, healthScore - maxNestingPenalty));
 
     const overallScore = Math.round((testScore + docScore + healthScore) / 3);
 
@@ -243,8 +249,9 @@ export function analyzeRepo(
             icon: ARCH_ICONS[name],
             color: ARCH_COLORS[name],
             paths: archMap[name],
+            count: archCount[name],
         }))
-        .filter(b => b.paths.length > 0);
+        .filter(b => b.count > 0);
 
     const security = runSecurityScan(files);
     const activityInfo = meta
@@ -271,6 +278,6 @@ export function analyzeRepo(
         security,
         activity: activityInfo,
         packageAudit,
-        devopsAudit: { scanned: false, findings: [] },
+        devopsAudit: { scanned: false, findings: [] }, // route.ts tarafından override edilir
     };
 }

@@ -17,7 +17,7 @@ function BucketCard({ bucket }: BucketCardProps) {
     const [showAll, setShowAll] = useState(false);
     const PREVIEW_COUNT = 8;
     const displayed = showAll ? bucket.paths : bucket.paths.slice(0, PREVIEW_COUNT);
-    const remaining = bucket.paths.length - PREVIEW_COUNT;
+    const remaining = bucket.count - PREVIEW_COUNT;
 
     return (
         <div
@@ -37,7 +37,7 @@ function BucketCard({ bucket }: BucketCardProps) {
                         className="text-xs px-2 py-0.5 rounded-full font-medium"
                         style={{ backgroundColor: bucket.color + "20", color: bucket.color }}
                     >
-                        {bucket.paths.length}
+                        {bucket.count}
                     </span>
                 </div>
                 {open ? (

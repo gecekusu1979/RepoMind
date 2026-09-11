@@ -28,7 +28,8 @@ export interface FileTreeItem {
 export interface ArchitectureBucket {
   name: "Frontend" | "Backend" | "Database" | "Infra/DevOps" | "Tests" | "Config" | "Other";
   icon: string;
-  paths: string[];
+  paths: string[];  // max 8 örnek dosya
+  count: number;    // katmandaki toplam dosya sayısı
   color: string;
 }
 

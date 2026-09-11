@@ -70,7 +70,10 @@ export async function POST(req: NextRequest) {
             const isRateLimit =
                 msg.includes("istek limiti") || msg.includes("rate limit");
             const status = isNotFound ? 404 : isRateLimit ? 429 : 500;
-            return NextResponse.json({ error: msg }, { status });
+            const finalMsg = isNotFound
+                ? `${msg} (Eğer depo özelse, sistemin erişebilmesi için kişisel token kullanmalısınız.)`
+                : msg;
+            return NextResponse.json({ error: finalMsg }, { status });
         }
 
         let treeResult;
