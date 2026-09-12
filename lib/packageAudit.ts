@@ -84,7 +84,7 @@ export async function auditPackages(packageJsonString: string | null): Promise<P
                 });
 
                 if (res.ok) {
-                    const data = await res.json() as Record<string, any[]>;
+                    const data = await res.json() as Record<string, { severity?: string; title?: string; url?: string }[]>;
                     for (const [dep, advisories] of Object.entries(data)) {
                         if (Array.isArray(advisories) && advisories.length > 0) {
                             const advisory = advisories[0];

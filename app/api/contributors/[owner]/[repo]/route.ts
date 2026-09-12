@@ -47,7 +47,7 @@ export async function GET(
 
         const data = await res.json();
         return NextResponse.json(data);
-    } catch (_e: unknown) {
+    } catch {
         return NextResponse.json(
             { error: "API isteğinde hata oluştu." },
             { status: 500 }

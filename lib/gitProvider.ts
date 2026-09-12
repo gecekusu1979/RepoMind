@@ -1,4 +1,4 @@
-﻿import { FileTreeItem, RepoMeta, ParsedRepoUrl, GitProvider } from "@/types/repo";
+﻿import { FileTreeItem, RepoMeta, ParsedRepoUrl } from "@/types/repo";
 
 export function isValidSlug(segment: string): boolean {
     return /^[a-zA-Z0-9_-]+$/.test(segment) && segment !== '..' && segment !== '.';
@@ -70,7 +70,7 @@ export async function fetchRepoMeta(parsed: ParsedRepoUrl): Promise<RepoMeta> {
             description: data.description, stars: data.star_count, forks: data.forks_count,
             language: null, topics: data.tag_list ?? [], defaultBranch: data.default_branch,
             createdAt: data.created_at, updatedAt: data.last_activity_at,
-            license: undefined as any, openIssues: 0, size: 0, url: data.web_url,
+            license: null, openIssues: 0, size: 0, url: data.web_url,
             homepage: null, watchers: 0
         };
     } else {
@@ -97,7 +97,7 @@ export async function fetchFileTree(parsed: ParsedRepoUrl, branch: string): Prom
         if (!res.ok) throw new Error("Dosya ağacı alınamadı (GitHub).");
         const data = await res.json();
         return {
-            items: (data.tree ?? []).map((item: any) => ({
+            items: (data.tree ?? []).map((item: { path: string; type: string; size?: number; sha: string }) => ({
                 path: item.path, type: item.type as "blob" | "tree", size: item.size, sha: item.sha
             })),
             truncated: data.truncated
@@ -107,7 +107,7 @@ export async function fetchFileTree(parsed: ParsedRepoUrl, branch: string): Prom
         const res = await fetch(`https://gitlab.com/api/v4/projects/${id}/repository/tree?ref=${branch}&recursive=true&per_page=100`, { next: { revalidate: 60 } });
         if (!res.ok) throw new Error("Dosya ağacı alınamadı (GitLab).");
         const data = await res.json();
-        const items = data.map((item: any) => ({
+        const items = data.map((item: { path: string; type: string; id: string }) => ({
             path: item.path, type: item.type === "tree" ? "tree" : "blob", size: 0, sha: item.id
         }));
         return { items, truncated: true };

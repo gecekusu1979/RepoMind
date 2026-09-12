@@ -81,7 +81,7 @@ export async function GET(
         const parsed = { provider: 'github' as const, owner, repo };
         const meta = await fetchRepoMeta(parsed);
         const { items, truncated } = await fetchFileTree(parsed, meta.defaultBranch);
-        const [{ readme, packageJson }, devopsAudit] = await Promise.all([
+        const [{ readme, packageJson }] = await Promise.all([
             fetchCriticalFiles(parsed, meta.defaultBranch, items),
             runDevopsLinter(parsed, meta.defaultBranch, items),
         ]);
@@ -106,7 +106,7 @@ export async function GET(
                 "X-Content-Type-Options": "nosniff",
             },
         });
-    } catch (_e: unknown) {
+    } catch {
         const errorSvg = buildSvg("RepoMind", "hata", "#6b7280");
         return new Response(errorSvg, {
             headers: {
