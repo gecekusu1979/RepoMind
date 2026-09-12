@@ -114,15 +114,15 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Toolti
     const color = CATEGORY_COLORS[cat as keyof typeof CATEGORY_COLORS] ?? CATEGORY_COLORS["other"];
 
     return (
-        <div className="bg-[#0f0f1a] border border-white/10 rounded-xl px-3 py-2.5 text-xs shadow-2xl max-w-xs">
-            <p className="font-mono text-white/80 font-semibold truncate">{data.path ?? data.name}</p>
+        <div className="bg-[#0f0f1a] border border-zinc-900/10 dark:border-white/10 rounded-xl px-3 py-2.5 text-xs shadow-2xl max-w-xs">
+            <p className="font-mono text-zinc-900/80 dark:text-white/80 font-semibold truncate">{data.path ?? data.name}</p>
             <div className="flex items-center gap-2 mt-1">
                 <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
-                <span className="text-white/50">{cat}</span>
+                <span className="text-zinc-900/50 dark:text-white/50">{cat}</span>
             </div>
-            <p className="text-white/60 mt-1">
-                Boyut: <span className="text-white font-semibold">{formatBytes(data.value ?? 0)}</span>
-                {percentage && <span className="text-white/40 ml-2">({percentage}%)</span>}
+            <p className="text-zinc-900/60 dark:text-white/60 mt-1">
+                Boyut: <span className="text-zinc-900 dark:text-white font-semibold">{formatBytes(data.value ?? 0)}</span>
+                {percentage && <span className="text-zinc-900/40 dark:text-white/40 ml-2">({percentage}%)</span>}
             </p>
         </div>
     );
@@ -184,7 +184,7 @@ export const TreemapVisualizer = React.memo(function TreemapVisualizer({
 
     if (flatData.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center h-48 gap-3 text-white/30 text-sm">
+            <div className="flex flex-col items-center justify-center h-48 gap-3 text-zinc-900/30 dark:text-white/30 text-sm">
                 <p>Boyut verisi mevcut değil (GitHub API ağaç verisi boyut içermiyor olabilir).</p>
                 {selectedLayer && onClearFilter && (
                     <button
@@ -203,11 +203,11 @@ export const TreemapVisualizer = React.memo(function TreemapVisualizer({
             {/* Controls */}
             <div className="flex items-center justify-between gap-2 flex-wrap">
                 <div className="space-y-0.5">
-                    <h3 className="text-xs font-semibold text-white/30 uppercase tracking-widest">
+                    <h3 className="text-xs font-semibold text-zinc-900/30 dark:text-white/30 uppercase tracking-widest">
                         Dosya Boyutu Isı Haritası
                     </h3>
-                    <p className="text-xs text-white/25">
-                        Toplam: <span className="text-white/50 font-medium">{formatBytes(totalBytes)}</span>
+                    <p className="text-xs text-zinc-900/25 dark:text-white/25">
+                        Toplam: <span className="text-zinc-900/50 dark:text-white/50 font-medium">{formatBytes(totalBytes)}</span>
                     </p>
                 </div>
 
@@ -219,7 +219,7 @@ export const TreemapVisualizer = React.memo(function TreemapVisualizer({
                             Filtre: {selectedLayer} ({filteredCount} dosya)
                             <button
                                 onClick={onClearFilter}
-                                className="ml-1 hover:text-white transition-colors"
+                                className="ml-1 hover:text-zinc-900 dark:text-white transition-colors"
                                 title="Filtreyi temizle"
                             >
                                 <X className="w-3 h-3" />
@@ -228,14 +228,14 @@ export const TreemapVisualizer = React.memo(function TreemapVisualizer({
                     )}
 
                     {/* Depth controls */}
-                    <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-xl p-1">
+                    <div className="flex items-center gap-1 bg-zinc-900/5 dark:bg-white/5 border border-zinc-900/10 dark:border-white/10 rounded-xl p-1">
                         {([1, 2, 3, 4] as Depth[]).map((d) => (
                             <button
                                 key={d}
                                 onClick={() => setDepth(d)}
                                 className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${depth === d
                                     ? "bg-indigo-500/40 text-indigo-300 border border-indigo-500/40"
-                                    : "text-white/30 hover:text-white/60"
+                                    : "text-zinc-900/30 dark:text-white/30 hover:text-zinc-900/60 dark:text-white/60"
                                     }`}
                             >
                                 {d === 4 ? "Tam" : `D${d}`}
@@ -246,7 +246,7 @@ export const TreemapVisualizer = React.memo(function TreemapVisualizer({
             </div>
 
             {/* Treemap */}
-            <div className="w-full rounded-xl overflow-hidden border border-white/5" style={{ height: 340 }}>
+            <div className="w-full rounded-xl overflow-hidden border border-zinc-900/5 dark:border-white/5" style={{ height: 340 }}>
                 <ResponsiveContainer width="100%" height="100%">
                     <Treemap
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -269,7 +269,7 @@ export const TreemapVisualizer = React.memo(function TreemapVisualizer({
                             className="w-2.5 h-2.5 rounded-sm flex-shrink-0"
                             style={{ backgroundColor: CATEGORY_COLORS[cat] }}
                         />
-                        <span className="text-xs text-white/40">{label}</span>
+                        <span className="text-xs text-zinc-900/40 dark:text-white/40">{label}</span>
                     </div>
                 ))}
             </div>

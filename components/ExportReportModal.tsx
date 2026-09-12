@@ -50,16 +50,16 @@ export function ExportReportModal({ data }: ExportReportModalProps) {
                         aria-hidden
                     />
                     {/* Panel */}
-                    <div className="absolute right-0 top-full mt-2 z-50 w-72 bg-[#0d0d1a] border border-white/10 rounded-2xl shadow-2xl shadow-black/60 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="absolute right-0 top-full mt-2 z-50 w-72 bg-[#0d0d1a] border border-zinc-900/10 dark:border-white/10 rounded-2xl shadow-2xl shadow-black/60 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
                         {/* Header */}
-                        <div className="flex items-center justify-between px-4 py-3 bg-white/[0.03] border-b border-white/10">
+                        <div className="flex items-center justify-between px-4 py-3 bg-zinc-900/[0.03] dark:bg-white/[0.03] border-b border-zinc-900/10 dark:border-white/10">
                             <div>
-                                <p className="text-xs font-semibold text-white/80">Audit Raporu</p>
-                                <p className="text-[10px] text-white/30 mt-0.5">{data.meta.fullName}</p>
+                                <p className="text-xs font-semibold text-zinc-900/80 dark:text-white/80">Audit Raporu</p>
+                                <p className="text-[10px] text-zinc-900/30 dark:text-white/30 mt-0.5">{data.meta.fullName}</p>
                             </div>
                             <button
                                 onClick={() => setOpen(false)}
-                                className="p-1 text-white/30 hover:text-white/70 transition-colors rounded-lg hover:bg-white/5"
+                                className="p-1 text-zinc-900/30 dark:text-white/30 hover:text-zinc-900/70 dark:text-white/70 transition-colors rounded-lg hover:bg-zinc-900/5 dark:bg-white/5"
                             >
                                 <X className="w-4 h-4" />
                             </button>
@@ -68,7 +68,7 @@ export function ExportReportModal({ data }: ExportReportModalProps) {
                         {/* Body */}
                         <div className="p-3 space-y-2">
                             {/* Summary row */}
-                            <div className="grid grid-cols-3 gap-2 pb-2 border-b border-white/5">
+                            <div className="grid grid-cols-3 gap-2 pb-2 border-b border-zinc-900/5 dark:border-white/5">
                                 <ScorePill label="Genel" score={data.analysis.metrics.overall} />
                                 <ScorePill label="Test" score={data.analysis.metrics.testScore} />
                                 <ScorePill label="Sağlık" score={data.analysis.metrics.healthScore} />
@@ -77,16 +77,16 @@ export function ExportReportModal({ data }: ExportReportModalProps) {
                             {/* Markdown download */}
                             <button
                                 onClick={handleMdDownload}
-                                className="w-full flex items-center gap-3 px-4 py-3 bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 hover:border-white/20 rounded-xl transition-all text-left group"
+                                className="w-full flex items-center gap-3 px-4 py-3 bg-zinc-900/[0.03] dark:bg-white/[0.03] hover:bg-zinc-900/[0.06] dark:bg-white/[0.06] border border-zinc-900/10 dark:border-white/10 hover:border-zinc-900/20 dark:border-white/20 rounded-xl transition-all text-left group"
                             >
                                 <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
                                     <FileDown className="w-4 h-4 text-emerald-400" />
                                 </div>
                                 <div>
-                                    <p className="text-xs font-semibold text-white/80 group-hover:text-white transition-colors">
+                                    <p className="text-xs font-semibold text-zinc-900/80 dark:text-white/80 group-hover:text-zinc-900 dark:text-white transition-colors">
                                         Markdown İndir
                                     </p>
-                                    <p className="text-[10px] text-white/30">
+                                    <p className="text-[10px] text-zinc-900/30 dark:text-white/30">
                                         repomind-audit-{data.meta.name}.md
                                     </p>
                                 </div>
@@ -96,16 +96,16 @@ export function ExportReportModal({ data }: ExportReportModalProps) {
                             <button
                                 onClick={handlePdfExport}
                                 disabled={pdfLoading}
-                                className="w-full flex items-center gap-3 px-4 py-3 bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 hover:border-white/20 rounded-xl transition-all text-left group disabled:opacity-50"
+                                className="w-full flex items-center gap-3 px-4 py-3 bg-zinc-900/[0.03] dark:bg-white/[0.03] hover:bg-zinc-900/[0.06] dark:bg-white/[0.06] border border-zinc-900/10 dark:border-white/10 hover:border-zinc-900/20 dark:border-white/20 rounded-xl transition-all text-left group disabled:opacity-50"
                             >
                                 <div className="w-8 h-8 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center flex-shrink-0">
                                     <Printer className="w-4 h-4 text-violet-400" />
                                 </div>
                                 <div>
-                                    <p className="text-xs font-semibold text-white/80 group-hover:text-white transition-colors">
+                                    <p className="text-xs font-semibold text-zinc-900/80 dark:text-white/80 group-hover:text-zinc-900 dark:text-white transition-colors">
                                         PDF Olarak Yazdır
                                     </p>
-                                    <p className="text-[10px] text-white/30">
+                                    <p className="text-[10px] text-zinc-900/30 dark:text-white/30">
                                         Tarayıcı baskı motoru · Vektör kalite
                                     </p>
                                 </div>
@@ -113,8 +113,8 @@ export function ExportReportModal({ data }: ExportReportModalProps) {
                         </div>
 
                         {/* Footer note */}
-                        <div className="px-4 py-2.5 bg-white/[0.02] border-t border-white/5">
-                            <p className="text-[10px] text-white/20">
+                        <div className="px-4 py-2.5 bg-zinc-900/[0.02] dark:bg-white/[0.02] border-t border-zinc-900/5 dark:border-white/5">
+                            <p className="text-[10px] text-zinc-900/20 dark:text-white/20">
                                 Sunucu yok · API anahtarı yok · Sıfır maliyet
                             </p>
                         </div>
@@ -129,9 +129,9 @@ function ScorePill({ label, score }: { label: string; score: number }) {
     const color =
         score >= 80 ? "text-emerald-400" : score >= 60 ? "text-amber-400" : "text-red-400";
     return (
-        <div className="flex flex-col items-center gap-0.5 py-1.5 px-2 bg-white/[0.03] rounded-xl">
+        <div className="flex flex-col items-center gap-0.5 py-1.5 px-2 bg-zinc-900/[0.03] dark:bg-white/[0.03] rounded-xl">
             <span className={`text-sm font-bold ${color}`}>{score}</span>
-            <span className="text-[9px] text-white/30">{label}</span>
+            <span className="text-[9px] text-zinc-900/30 dark:text-white/30">{label}</span>
         </div>
     );
 }

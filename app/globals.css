@@ -11,8 +11,8 @@
 
 html,
 body {
-  background-color: #070710;
-  color: white;
+  @apply bg-[#f8fafc] dark:bg-[#070710];
+  @apply text-zinc-900 dark:text-white;
   font-family: var(--font-inter);
 }
 
@@ -89,7 +89,7 @@ body {
   font-weight: 600;
   margin-top: 1.5rem;
   margin-bottom: 0.5rem;
-  color: white;
+  @apply text-zinc-900 dark:text-white;
   display: flex;
   align-items: center;
   gap: 0.5rem;

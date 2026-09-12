@@ -105,20 +105,20 @@ export function ArchitectureFlow({ buckets, onLayerSelect, selectedLayer }: Arch
     if (error) return null;
 
     if (!svg) {
-        return <div className="animate-pulse h-48 bg-white/5 rounded-2xl w-full border border-white/10" />;
+        return <div className="animate-pulse h-48 bg-zinc-900/5 dark:bg-white/5 rounded-2xl w-full border border-zinc-900/10 dark:border-white/10" />;
     }
 
     return (
-        <div className="rounded-2xl border bg-zinc-950 border-white/10 overflow-hidden relative">
+        <div className="rounded-2xl border bg-white dark:bg-zinc-950 border-zinc-900/10 dark:border-white/10 overflow-hidden relative">
             {/* Controls */}
-            <div className="absolute top-3 right-3 flex items-center gap-1 bg-white/5 border border-white/10 rounded-lg p-1 z-10">
-                <button onClick={() => setScale(s => Math.min(2, s + 0.1))} className="p-1 hover:bg-white/10 rounded text-white/50 hover:text-white/80 transition-colors">
+            <div className="absolute top-3 right-3 flex items-center gap-1 bg-zinc-900/5 dark:bg-white/5 border border-zinc-900/10 dark:border-white/10 rounded-lg p-1 z-10">
+                <button onClick={() => setScale(s => Math.min(2, s + 0.1))} className="p-1 hover:bg-zinc-900/10 dark:bg-white/10 rounded text-zinc-900/50 dark:text-white/50 hover:text-zinc-900/80 dark:text-white/80 transition-colors">
                     <ZoomIn className="w-4 h-4" />
                 </button>
-                <button onClick={() => setScale(1)} className="p-1 hover:bg-white/10 rounded text-white/50 hover:text-white/80 transition-colors">
+                <button onClick={() => setScale(1)} className="p-1 hover:bg-zinc-900/10 dark:bg-white/10 rounded text-zinc-900/50 dark:text-white/50 hover:text-zinc-900/80 dark:text-white/80 transition-colors">
                     <Expand className="w-4 h-4" />
                 </button>
-                <button onClick={() => setScale(s => Math.max(0.5, s - 0.1))} className="p-1 hover:bg-white/10 rounded text-white/50 hover:text-white/80 transition-colors">
+                <button onClick={() => setScale(s => Math.max(0.5, s - 0.1))} className="p-1 hover:bg-zinc-900/10 dark:bg-white/10 rounded text-zinc-900/50 dark:text-white/50 hover:text-zinc-900/80 dark:text-white/80 transition-colors">
                     <ZoomOut className="w-4 h-4" />
                 </button>
             </div>

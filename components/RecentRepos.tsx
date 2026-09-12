@@ -58,8 +58,8 @@ export function RecentRepos({ onSelect, currentRepo }: RecentReposProps) {
     return (
         <div className="w-full">
             <div className="flex items-center gap-1.5 mb-2">
-                <Clock className="w-3 h-3 text-white/25" />
-                <span className="text-xs text-white/25 font-medium">Son Aramalar</span>
+                <Clock className="w-3 h-3 text-zinc-900/25 dark:text-white/25" />
+                <span className="text-xs text-zinc-900/25 dark:text-white/25 font-medium">Son Aramalar</span>
             </div>
             <div className="flex items-center gap-2 flex-wrap">
                 {recents.map((repo) => {
@@ -73,7 +73,7 @@ export function RecentRepos({ onSelect, currentRepo }: RecentReposProps) {
                             onClick={() => onSelect(repo.fullName)}
                             className={`group relative flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-xl border text-xs transition-all ${isActive
                                     ? "bg-indigo-500/15 border-indigo-500/30 text-indigo-300"
-                                    : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 text-white/50 hover:text-white/80"
+                                    : "bg-zinc-900/5 dark:bg-white/5 border-zinc-900/10 dark:border-white/10 hover:bg-zinc-900/10 dark:bg-white/10 hover:border-zinc-900/20 dark:border-white/20 text-zinc-900/50 dark:text-white/50 hover:text-zinc-900/80 dark:text-white/80"
                                 }`}
                         >
                             {/* Language dot */}
@@ -85,7 +85,7 @@ export function RecentRepos({ onSelect, currentRepo }: RecentReposProps) {
 
                             {/* Star count */}
                             {repo.stars > 0 && (
-                                <span className="flex items-center gap-0.5 text-white/25 text-[10px]">
+                                <span className="flex items-center gap-0.5 text-zinc-900/25 dark:text-white/25 text-[10px]">
                                     <Star className="w-2.5 h-2.5" />
                                     {repo.stars >= 1000
                                         ? `${(repo.stars / 1000).toFixed(1)}k`
@@ -95,7 +95,7 @@ export function RecentRepos({ onSelect, currentRepo }: RecentReposProps) {
 
                             {/* Cache TTL badge */}
                             {ttlRemaining != null && (
-                                <span className="text-[10px] text-white/20 font-medium">
+                                <span className="text-[10px] text-zinc-900/20 dark:text-white/20 font-medium">
                                     {formatTTL(ttlRemaining)}
                                 </span>
                             )}
@@ -104,7 +104,7 @@ export function RecentRepos({ onSelect, currentRepo }: RecentReposProps) {
                             <span
                                 role="button"
                                 onClick={(e) => handleRemove(e, repo.fullName)}
-                                className="ml-0.5 p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-white/10 text-white/30 hover:text-white/60 transition-all cursor-pointer"
+                                className="ml-0.5 p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-zinc-900/10 dark:bg-white/10 text-zinc-900/30 dark:text-white/30 hover:text-zinc-900/60 dark:text-white/60 transition-all cursor-pointer"
                                 title="Kaldır"
                             >
                                 <X className="w-3 h-3" />

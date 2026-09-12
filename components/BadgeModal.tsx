@@ -75,7 +75,7 @@ export default function BadgeModal({ isOpen, onClose, owner, repo }: BadgeModalP
     return createPortal(
         <div role="dialog" aria-modal="true" aria-labelledby="modal-title" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-150">
             <div
-                className="w-full max-w-lg bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl p-6 space-y-6 relative max-h-[90vh] overflow-y-auto no-scrollbar"
+                className="w-full max-w-lg bg-white dark:bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl p-6 space-y-6 relative max-h-[90vh] overflow-y-auto no-scrollbar"
                 onClick={(e) => e.stopPropagation()}
                 tabIndex={-1}
                 autoFocus
@@ -156,9 +156,9 @@ export default function BadgeModal({ isOpen, onClose, owner, repo }: BadgeModalP
                 <div className="pt-2 flex justify-end">
                     <button
                         onClick={handleCopy}
-                        className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-2 transition"
+                        className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-zinc-900 dark:text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-2 transition"
                     >
-                        {copied ? <Check className="w-4 h-4 text-white" /> : <Copy className="w-4 h-4" />}
+                        {copied ? <Check className="w-4 h-4 text-zinc-900 dark:text-white" /> : <Copy className="w-4 h-4" />}
                         <span>{copied ? "Kopyalandı!" : "Rozet Kodunu Kopyala"}</span>
                     </button>
                 </div>

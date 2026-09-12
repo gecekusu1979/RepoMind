@@ -1,12 +1,14 @@
 ﻿import { NextRequest, NextResponse } from "next/server";
 import {
-    parseGitHubUrl,
+    parseRepoUrl,
     fetchRepoMeta,
     fetchFileTree,
     fetchCriticalFiles,
-} from "@/lib/github";
+    fetchCommitActivity,
+} from "@/lib/gitProvider";
 import { analyzeRepo } from "@/lib/analyzer";
 import { runDevopsLinter } from "@/lib/devopsLinter";
+import { auditPackages } from "@/lib/packageAudit";
 import { checkRateLimit, rateLimitHeaders } from "@/lib/rateLimit";
 
 export const runtime = "edge";
@@ -50,7 +52,7 @@ export async function POST(req: NextRequest) {
 
         let parsed;
         try {
-            parsed = parseGitHubUrl(url);
+            parsed = parseRepoUrl(url);
         } catch (e: unknown) {
             return NextResponse.json(
                 { error: e instanceof Error ? e.message : "Geçersiz URL." },
@@ -58,11 +60,9 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const { owner, repo } = parsed;
-
         let meta;
         try {
-            meta = await fetchRepoMeta(owner, repo);
+            meta = await fetchRepoMeta(parsed);
         } catch (e: unknown) {
             const msg =
                 e instanceof Error ? e.message : "Depo bilgileri alınamadı.";
@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
 
         let treeResult;
         try {
-            treeResult = await fetchFileTree(owner, repo, meta.defaultBranch);
+            treeResult = await fetchFileTree(parsed, meta.defaultBranch);
         } catch (e: unknown) {
             const msg =
                 e instanceof Error ? e.message : "Dosya ağacı alınamadı.";
@@ -88,12 +88,17 @@ export async function POST(req: NextRequest) {
 
         const { items, truncated } = treeResult;
 
-        const [{ readme, packageJson }, devopsAudit] = await Promise.all([
-            fetchCriticalFiles(owner, repo, meta.defaultBranch, items),
-            runDevopsLinter(owner, repo, meta.defaultBranch, items),
+        const { readme, packageJson } = await fetchCriticalFiles(parsed, meta.defaultBranch, items);
+
+        const [devopsAudit, commitActivity, packageAudit] = await Promise.all([
+            runDevopsLinter(parsed, meta.defaultBranch, items),
+            fetchCommitActivity(parsed),
+            auditPackages(packageJson)
         ]);
 
         const analysis = analyzeRepo(items, readme, packageJson, truncated, meta);
+        analysis.commitActivity = commitActivity;
+        analysis.packageAudit = packageAudit;
 
         return NextResponse.json(
             { meta, analysis: { ...analysis, devopsAudit } },

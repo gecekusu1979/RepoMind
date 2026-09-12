@@ -11,7 +11,7 @@ export function BadgeList({ goodPractices, potentialProblems }: BadgeListProps) 
             {/* Problems */}
             {potentialProblems.length > 0 && (
                 <div className="space-y-2">
-                    <h3 className="text-xs font-semibold text-white/30 uppercase tracking-widest">
+                    <h3 className="text-xs font-semibold text-zinc-900/30 dark:text-white/30 uppercase tracking-widest">
                         Potential Problems
                     </h3>
                     <div className="flex flex-wrap gap-2">
@@ -36,7 +36,7 @@ export function BadgeList({ goodPractices, potentialProblems }: BadgeListProps) 
             {/* Good Practices */}
             {goodPractices.length > 0 && (
                 <div className="space-y-2">
-                    <h3 className="text-xs font-semibold text-white/30 uppercase tracking-widest">
+                    <h3 className="text-xs font-semibold text-zinc-900/30 dark:text-white/30 uppercase tracking-widest">
                         Good Practices
                     </h3>
                     <div className="flex flex-wrap gap-2">
@@ -53,7 +53,7 @@ export function BadgeList({ goodPractices, potentialProblems }: BadgeListProps) 
             )}
 
             {potentialProblems.length === 0 && goodPractices.length === 0 && (
-                <div className="text-white/30 text-sm text-center py-4">
+                <div className="text-zinc-900/30 dark:text-white/30 text-sm text-center py-4">
                     No specific patterns detected.
                 </div>
             )}

@@ -41,7 +41,7 @@ export function LanguageBar({ languages }: LanguageBarProps) {
 
     return (
         <div className="space-y-3">
-            <h3 className="text-xs font-semibold text-white/30 uppercase tracking-widest">
+            <h3 className="text-xs font-semibold text-zinc-900/30 dark:text-white/30 uppercase tracking-widest">
                 Language Distribution
             </h3>
 
@@ -68,8 +68,8 @@ export function LanguageBar({ languages }: LanguageBarProps) {
                             className="w-2.5 h-2.5 rounded-full flex-shrink-0"
                             style={{ backgroundColor: getColor(l.lang) }}
                         />
-                        <span className="text-xs text-white/50 font-medium">{l.lang}</span>
-                        <span className="text-xs text-white/25">{l.percentage}%</span>
+                        <span className="text-xs text-zinc-900/50 dark:text-white/50 font-medium">{l.lang}</span>
+                        <span className="text-xs text-zinc-900/25 dark:text-white/25">{l.percentage}%</span>
                     </div>
                 ))}
             </div>

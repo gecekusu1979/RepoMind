@@ -15,7 +15,7 @@ const DEPRECATED_PACKAGES: Record<string, { recommended: string; severity: Packa
 
 const VIRAL_LICENSES = ["gpl", "agpl", "lgpl"];
 
-export function auditPackages(packageJsonString: string | null): PackageAuditResult {
+export async function auditPackages(packageJsonString: string | null): Promise<PackageAuditResult> {
     if (!packageJsonString) {
         return { hasPackageJson: false, findings: [] };
     }
@@ -44,7 +44,6 @@ export function auditPackages(packageJsonString: string | null): PackageAuditRes
         const dangerousPatterns = [/curl\s+/, /wget\s+/, /bash\s+-c/, /rm\s+-rf\s+\//];
         for (const [scriptName, scriptContent] of Object.entries(scripts)) {
             if (typeof scriptContent !== "string") continue;
-
             if (dangerousPatterns.some(regex => regex.test(scriptContent))) {
                 findings.push({
                     name: `script:${scriptName}`,
@@ -62,6 +61,50 @@ export function auditPackages(packageJsonString: string | null): PackageAuditRes
                 reason: `Viral/Copyleft lisans tespit edildi (${pkg.license}).`,
                 recommendation: "Ticari kullanım kısıtlamalarını gözden geçirin (GPL/AGPL varyantı).",
             });
+        }
+
+        try {
+            const allDepEntries = { ...pkg.dependencies, ...pkg.devDependencies };
+            const payload: Record<string, string[]> = {};
+
+            for (const [dep, versionReq] of Object.entries(allDepEntries)) {
+                if (typeof versionReq === "string") {
+                    const cleanVersion = versionReq.replace(/[\^~><=]/g, '').trim();
+                    if (/^\d+\.\d+\.\d+/.test(cleanVersion)) {
+                        payload[dep] = [cleanVersion];
+                    }
+                }
+            }
+
+            if (Object.keys(payload).length > 0) {
+                const res = await fetch("https://registry.npmjs.org/-/npm/v1/security/advisories/bulk", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    const data = await res.json() as Record<string, any[]>;
+                    for (const [dep, advisories] of Object.entries(data)) {
+                        if (Array.isArray(advisories) && advisories.length > 0) {
+                            const advisory = advisories[0];
+                            const rawSeverity = (advisory.severity || "medium").toLowerCase();
+                            const mappedSeverity: PackageRiskSeverity = ["critical", "high"].includes(rawSeverity)
+                                ? "high"
+                                : "medium";
+
+                            findings.push({
+                                name: dep,
+                                severity: mappedSeverity,
+                                reason: `Güvenlik açığı tespit edildi (CVE): ${advisory.title || "Bilinmiyor"} (kullanılan versiyon: ${payload[dep][0]})`,
+                                recommendation: `Paketi daha yeni bir versiyona güncelleyin: ${advisory.url || "NPM Audit"} üzerinden inceleyin.`,
+                            });
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("NPM audit request failed", e);
         }
 
         return { hasPackageJson: true, findings };

@@ -53,16 +53,16 @@ export function GoodFirstIssues({ meta }: GoodFirstIssuesProps) {
     }, [fetchIssues]);
 
     return (
-        <div ref={containerRef} className="rounded-2xl border bg-white/[0.03] border-white/10 overflow-hidden p-5 flex flex-col h-full">
+        <div ref={containerRef} className="rounded-2xl border bg-zinc-900/[0.03] dark:bg-white/[0.03] border-zinc-900/10 dark:border-white/10 overflow-hidden p-5 flex flex-col h-full">
             <div className="flex items-center gap-2 mb-4">
                 <HeartHandshake className="w-5 h-5 text-emerald-400" />
-                <h3 className="text-sm font-semibold text-white/80">Yeni Başlayanlar İçin Issue&apos;lar</h3>
+                <h3 className="text-sm font-semibold text-zinc-900/80 dark:text-white/80">Yeni Başlayanlar İçin Issue&apos;lar</h3>
             </div>
 
             {loading && (
                 <div className="space-y-3 animate-pulse">
                     {[1, 2, 3].map(i => (
-                        <div key={i} className="h-16 bg-white/5 rounded-xl border border-white/5" />
+                        <div key={i} className="h-16 bg-zinc-900/5 dark:bg-white/5 rounded-xl border border-zinc-900/5 dark:border-white/5" />
                     ))}
                 </div>
             )}
@@ -81,14 +81,14 @@ export function GoodFirstIssues({ meta }: GoodFirstIssuesProps) {
                             href={issue.html_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="block p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group"
+                            className="block p-3 rounded-xl bg-zinc-900/5 dark:bg-white/5 hover:bg-zinc-900/10 dark:bg-white/10 border border-zinc-900/10 dark:border-white/10 transition-colors group"
                         >
-                            <h4 className="text-sm font-semibold text-white/80 group-hover:text-emerald-300 transition-colors line-clamp-1">
+                            <h4 className="text-sm font-semibold text-zinc-900/80 dark:text-white/80 group-hover:text-emerald-300 transition-colors line-clamp-1">
                                 {issue.title}
                             </h4>
-                            <div className="flex items-center justify-between mt-2 text-xs text-white/40">
+                            <div className="flex items-center justify-between mt-2 text-xs text-zinc-900/40 dark:text-white/40">
                                 <div className="flex items-center gap-3">
-                                    <span className="font-mono text-white/30">#{issue.number}</span>
+                                    <span className="font-mono text-zinc-900/30 dark:text-white/30">#{issue.number}</span>
                                     <span className="flex items-center gap-1">
                                         <MessageSquare className="w-3.5 h-3.5" /> {issue.comments}
                                     </span>
@@ -109,7 +109,7 @@ export function GoodFirstIssues({ meta }: GoodFirstIssuesProps) {
                         <Activity className="w-5 h-5 text-emerald-400" />
                     </div>
                     <p className="text-sm font-semibold text-emerald-400 mb-1">Harika Haber!</p>
-                    <p className="text-xs text-white/50 max-w-[200px]">Şu an açık &apos;good first issue&apos; bulunmuyor var olanların çoğu çözülmüş.</p>
+                    <p className="text-xs text-zinc-900/50 dark:text-white/50 max-w-[200px]">Şu an açık &apos;good first issue&apos; bulunmuyor var olanların çoğu çözülmüş.</p>
                 </div>
             )}
         </div>

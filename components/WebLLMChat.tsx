@@ -179,7 +179,7 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
             <div className="fixed bottom-6 right-6 z-50">
                 <button
                     onClick={() => setOpen(!open)}
-                    className="flex items-center justify-center p-3.5 bg-zinc-800 border border-white/10 text-white/50 rounded-full shadow-2xl hover:bg-zinc-700 hover:text-white/80 transition-all cursor-not-allowed"
+                    className="flex items-center justify-center p-3.5 bg-zinc-800 border border-zinc-900/10 dark:border-white/10 text-zinc-900/50 dark:text-white/50 rounded-full shadow-2xl hover:bg-zinc-700 hover:text-zinc-900/80 dark:text-white/80 transition-all cursor-not-allowed"
                     title="WebGPU desteklenmiyor"
                 >
                     <ShieldAlert className="w-5 h-5" />
@@ -191,28 +191,28 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
     return (
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
             {open && (
-                <div className="w-[360px] md:w-[420px] h-[600px] max-h-[85vh] flex flex-col bg-[#0b0b14] border border-white/10 rounded-2xl overflow-hidden shadow-2xl mb-4 animate-in slide-in-from-bottom-4 duration-300">
+                <div className="w-[360px] md:w-[420px] h-[600px] max-h-[85vh] flex flex-col bg-[#0b0b14] border border-zinc-900/10 dark:border-white/10 rounded-2xl overflow-hidden shadow-2xl mb-4 animate-in slide-in-from-bottom-4 duration-300">
                     {/* Header */}
-                    <div className="flex items-center justify-between p-4 bg-white/5 border-b border-white/10">
+                    <div className="flex items-center justify-between p-4 bg-zinc-900/5 dark:bg-white/5 border-b border-zinc-900/10 dark:border-white/10">
                         <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
-                                <Bot className="w-4 h-4 text-white" />
+                                <Bot className="w-4 h-4 text-zinc-900 dark:text-white" />
                             </div>
                             <div>
-                                <h3 className="text-sm font-semibold text-white/90">WebLLM Asistanı</h3>
-                                <p className="text-[10px] text-white/40 flex items-center gap-1">
+                                <h3 className="text-sm font-semibold text-zinc-900/90 dark:text-white/90">WebLLM Asistanı</h3>
+                                <p className="text-[10px] text-zinc-900/40 dark:text-white/40 flex items-center gap-1">
                                     <Cpu className="w-3 h-3" /> Yerel Çalışıyor (Zero-Key)
                                 </p>
                             </div>
                         </div>
-                        <button onClick={() => setOpen(false)} className="p-1 text-white/40 hover:text-white/80">
+                        <button onClick={() => setOpen(false)} className="p-1 text-zinc-900/40 dark:text-white/40 hover:text-zinc-900/80 dark:text-white/80">
                             <ChevronDown className="w-5 h-5" />
                         </button>
                     </div>
 
                     {/* Persona Selector */}
-                    <div className="px-4 py-2.5 bg-white/[0.02] border-b border-white/[0.05] flex items-center gap-2">
-                        <span className="text-[10px] text-white/30 font-semibold uppercase tracking-wider flex-shrink-0">Perspektif:</span>
+                    <div className="px-4 py-2.5 bg-zinc-900/[0.02] dark:bg-white/[0.02] border-b border-zinc-900/[0.05] dark:border-white/[0.05] flex items-center gap-2">
+                        <span className="text-[10px] text-zinc-900/30 dark:text-white/30 font-semibold uppercase tracking-wider flex-shrink-0">Perspektif:</span>
                         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
                             {(Object.keys(PERSONA_UI) as Persona[]).map((p) => {
                                 const ui = PERSONA_UI[p];
@@ -223,7 +223,7 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
                                         onClick={() => handlePersonaChange(p)}
                                         className={`flex items-center gap-1 px-2.5 py-1 rounded-full border text-[11px] font-semibold transition-all whitespace-nowrap flex-shrink-0 ${isActive
                                             ? ui.color
-                                            : "text-white/30 border-white/10 bg-transparent hover:bg-white/5 hover:text-white/50"
+                                            : "text-zinc-900/30 dark:text-white/30 border-zinc-900/10 dark:border-white/10 bg-transparent hover:bg-zinc-900/5 dark:bg-white/5 hover:text-zinc-900/50 dark:text-white/50"
                                             }`}
                                     >
                                         <span>{ui.icon}</span>
@@ -236,20 +236,20 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
                     </div>
 
                     {/* Chat Window */}
-                    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-zinc-950">
+                    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white dark:bg-zinc-950">
                         {!engine && progress.step >= 0 && (
                             <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
-                                <Cpu className="w-10 h-10 text-white/20 animate-pulse" />
+                                <Cpu className="w-10 h-10 text-zinc-900/20 dark:text-white/20 animate-pulse" />
                                 <div>
-                                    <p className="text-xs font-semibold text-white/70">{MODEL_ID}</p>
-                                    <p className="text-[10px] text-white/40 max-w-[200px] mx-auto mt-1">
+                                    <p className="text-xs font-semibold text-zinc-900/70 dark:text-white/70">{MODEL_ID}</p>
+                                    <p className="text-[10px] text-zinc-900/40 dark:text-white/40 max-w-[200px] mx-auto mt-1">
                                         Tarayıcınıza yükleniyor. Bu işlem bir defalık yaklaşık 100MB indirecektir.
                                     </p>
                                 </div>
-                                <div className="w-48 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                                <div className="w-48 h-1.5 bg-zinc-900/5 dark:bg-white/5 rounded-full overflow-hidden">
                                     <div className="h-full bg-indigo-500 transition-all duration-300" style={{ width: `${progress.step}%` }} />
                                 </div>
-                                <p className="text-[10px] text-white/40">{progress.text}</p>
+                                <p className="text-[10px] text-zinc-900/40 dark:text-white/40">{progress.text}</p>
                             </div>
                         )}
 
@@ -262,10 +262,10 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
 
                         {engine && messages.filter(m => m.role !== "system").map((m, i) => (
                             <div key={i} className={`flex items-start gap-2.5 max-w-[90%] ${m.role === "user" ? "ml-auto flex-row-reverse" : ""}`}>
-                                <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${m.role === "user" ? "bg-white/10" : "bg-indigo-500"}`}>
-                                    {m.role === "user" ? <User className="w-3.5 h-3.5 text-white/70" /> : <Bot className="w-3.5 h-3.5 text-white" />}
+                                <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${m.role === "user" ? "bg-zinc-900/10 dark:bg-white/10" : "bg-indigo-500"}`}>
+                                    {m.role === "user" ? <User className="w-3.5 h-3.5 text-zinc-900/70 dark:text-white/70" /> : <Bot className="w-3.5 h-3.5 text-zinc-900 dark:text-white" />}
                                 </div>
-                                <div className={`p-3 text-[13px] leading-relaxed rounded-2xl ${m.role === "user" ? "bg-white/10 text-white/90 rounded-tr-sm" : "bg-[#1a1a24] border border-white/5 text-white/80 rounded-tl-sm"}`}>
+                                <div className={`p-3 text-[13px] leading-relaxed rounded-2xl ${m.role === "user" ? "bg-zinc-900/10 dark:bg-white/10 text-zinc-900/90 dark:text-white/90 rounded-tr-sm" : "bg-[#1a1a24] border border-zinc-900/5 dark:border-white/5 text-zinc-900/80 dark:text-white/80 rounded-tl-sm"}`}>
                                     {m.content}
                                 </div>
                             </div>
@@ -275,13 +275,13 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
 
                     {/* Quick Prompts */}
                     {engine && messages.filter(m => m.role !== "system").length <= 1 && (
-                        <div className="px-4 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar border-t border-white/5 bg-zinc-950">
+                        <div className="px-4 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar border-t border-zinc-900/5 dark:border-white/5 bg-white dark:bg-zinc-950">
                             {QUICK_PROMPTS[persona].map(p => (
                                 <button
                                     key={p}
                                     onClick={() => handleSend(p)}
                                     disabled={loading}
-                                    className="whitespace-nowrap px-3 py-1.5 bg-white/5 hover:bg-indigo-500/20 border border-white/10 hover:border-indigo-500/40 text-[11px] text-white/60 hover:text-indigo-300 rounded-full transition-all"
+                                    className="whitespace-nowrap px-3 py-1.5 bg-zinc-900/5 dark:bg-white/5 hover:bg-indigo-500/20 border border-zinc-900/10 dark:border-white/10 hover:border-indigo-500/40 text-[11px] text-zinc-900/60 dark:text-white/60 hover:text-indigo-300 rounded-full transition-all"
                                 >
                                     {p}
                                 </button>
@@ -290,7 +290,7 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
                     )}
 
                     {/* Input field */}
-                    <div className="p-3 bg-white/5 border-t border-white/10 pb-4">
+                    <div className="p-3 bg-zinc-900/5 dark:bg-white/5 border-t border-zinc-900/10 dark:border-white/10 pb-4">
                         <div className="relative">
                             <input
                                 type="text"
@@ -299,12 +299,12 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
                                 onKeyDown={e => e.key === "Enter" && handleSend()}
                                 disabled={!engine || loading}
                                 placeholder={engine ? "RepoMind asistanına sor..." : "Model yükleniyor..."}
-                                className="w-full bg-zinc-950 border border-white/10 rounded-xl pl-4 pr-10 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-indigo-500/50 transition-colors"
+                                className="w-full bg-white dark:bg-zinc-950 border border-zinc-900/10 dark:border-white/10 rounded-xl pl-4 pr-10 py-3 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-900/20 dark:text-white/20 focus:outline-none focus:border-indigo-500/50 transition-colors"
                             />
                             <button
                                 onClick={() => handleSend()}
                                 disabled={!engine || loading || !input.trim()}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-400 disabled:opacity-30 transition-all"
+                                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-indigo-500 text-zinc-900 dark:text-white rounded-lg hover:bg-indigo-400 disabled:opacity-30 transition-all"
                             >
                                 <Send className="w-3.5 h-3.5" />
                             </button>
@@ -316,7 +316,7 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
             {!open && (
                 <button
                     onClick={handleToggle}
-                    className="flex items-center gap-2 px-5 py-3.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 border border-white/10 text-white font-semibold rounded-full shadow-lg shadow-indigo-500/25 transition-all outline-none focus:ring-2 ring-indigo-400/50"
+                    className="flex items-center gap-2 px-5 py-3.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 border border-zinc-900/10 dark:border-white/10 text-zinc-900 dark:text-white font-semibold rounded-full shadow-lg shadow-indigo-500/25 transition-all outline-none focus:ring-2 ring-indigo-400/50"
                 >
                     <MessageSquare className="w-5 h-5 flex-shrink-0" />
                     <span>Repo AI Asistanı</span>

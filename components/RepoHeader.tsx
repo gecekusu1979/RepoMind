@@ -56,22 +56,22 @@ export function RepoHeader({ meta, totalFiles, truncated, activity }: RepoHeader
             <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div className="space-y-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                        <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
-                            <span className="text-white/40">{meta.owner}/</span>
+                        <h1 className="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white tracking-tight">
+                            <span className="text-zinc-900/40 dark:text-white/40">{meta.owner}/</span>
                             <span className="bg-gradient-to-r from-white to-white/80 bg-clip-text">{meta.name}</span>
                         </h1>
                         <a
                             href={meta.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-white/30 hover:text-white/70 transition-colors"
+                            className="text-zinc-900/30 dark:text-white/30 hover:text-zinc-900/70 dark:text-white/70 transition-colors"
                             title="Open on GitHub"
                         >
                             <ExternalLink className="w-4 h-4" />
                         </a>
                     </div>
                     {meta.description && (
-                        <p className="text-white/50 text-sm md:text-base leading-relaxed max-w-2xl">
+                        <p className="text-zinc-900/50 dark:text-white/50 text-sm md:text-base leading-relaxed max-w-2xl">
                             {meta.description}
                         </p>
                     )}
@@ -96,7 +96,7 @@ export function RepoHeader({ meta, totalFiles, truncated, activity }: RepoHeader
                     <Pill icon={<span className="text-xs">⚖️</span>} label={meta.license} title="License" />
                 )}
                 <Pill
-                    icon={<Calendar className="w-3.5 h-3.5 text-white/30" />}
+                    icon={<Calendar className="w-3.5 h-3.5 text-zinc-900/30 dark:text-white/30" />}
                     label={`Updated ${updatedAt}`}
                     title="Last updated"
                 />
@@ -117,7 +117,7 @@ export function RepoHeader({ meta, totalFiles, truncated, activity }: RepoHeader
                         href={meta.homepage}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1.5 px-3 py-1 bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/10 rounded-full text-xs text-white/50 hover:text-white/80 transition-all"
+                        className="flex items-center gap-1.5 px-3 py-1 bg-zinc-900/5 dark:bg-white/5 border border-zinc-900/10 dark:border-white/10 hover:border-zinc-900/20 dark:border-white/20 hover:bg-zinc-900/10 dark:bg-white/10 rounded-full text-xs text-zinc-900/50 dark:text-white/50 hover:text-zinc-900/80 dark:text-white/80 transition-all"
                     >
                         <Globe className="w-3.5 h-3.5" />
                         Website
@@ -184,7 +184,7 @@ function Pill({
     return (
         <div
             title={title}
-            className="flex items-center gap-1.5 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs text-white/60 font-medium"
+            className="flex items-center gap-1.5 px-3 py-1 bg-zinc-900/5 dark:bg-white/5 border border-zinc-900/10 dark:border-white/10 rounded-full text-xs text-zinc-900/60 dark:text-white/60 font-medium"
         >
             {icon}
             <span>{label}</span>

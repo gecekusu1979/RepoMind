@@ -187,6 +187,7 @@ export interface AnalysisResult {
   activity: ActivityResult;
   packageAudit: PackageAuditResult;
   devopsAudit: DevOpsAuditResult;
+  commitActivity?: { date: string; count: number }[];
 }
 
 export interface AnalyzeResponse {
@@ -199,7 +200,10 @@ export interface ExplainRequest {
   analysis: AnalysisResult;
 }
 
-export interface ParsedGitHubUrl {
+export type GitProvider = "github" | "gitlab" | "bitbucket";
+
+export interface ParsedRepoUrl {
+  provider: GitProvider;
   owner: string;
   repo: string;
 }

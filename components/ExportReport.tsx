@@ -151,7 +151,7 @@ export function ExportReport({ data }: ExportReportProps) {
         <div className="flex items-center gap-2">
             <button
                 onClick={handleCopy}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/50 hover:text-white/80 text-xs rounded-xl transition-all font-medium"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900/5 dark:bg-white/5 hover:bg-zinc-900/10 dark:bg-white/10 border border-zinc-900/10 dark:border-white/10 hover:border-zinc-900/20 dark:border-white/20 text-zinc-900/50 dark:text-white/50 hover:text-zinc-900/80 dark:text-white/80 text-xs rounded-xl transition-all font-medium"
                 title="Markdown olarak kopyala"
             >
                 {copied ? (
@@ -163,7 +163,7 @@ export function ExportReport({ data }: ExportReportProps) {
             </button>
             <button
                 onClick={handleDownload}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/50 hover:text-white/80 text-xs rounded-xl transition-all font-medium"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900/5 dark:bg-white/5 hover:bg-zinc-900/10 dark:bg-white/10 border border-zinc-900/10 dark:border-white/10 hover:border-zinc-900/20 dark:border-white/20 text-zinc-900/50 dark:text-white/50 hover:text-zinc-900/80 dark:text-white/80 text-xs rounded-xl transition-all font-medium"
                 title="Markdown dosyası indir"
             >
                 <Download className="w-3.5 h-3.5" />

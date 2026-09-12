@@ -53,19 +53,19 @@ export function BusFactorCard({ meta }: BusFactorCardProps) {
     }, [fetchContributors]);
 
     return (
-        <div ref={containerRef} className="rounded-2xl border bg-white/[0.03] border-white/10 overflow-hidden relative p-5">
+        <div ref={containerRef} className="rounded-2xl border bg-zinc-900/[0.03] dark:bg-white/[0.03] border-zinc-900/10 dark:border-white/10 overflow-hidden relative p-5">
             <div className="flex items-center gap-2 mb-4">
                 <Users className="w-5 h-5 text-indigo-400" />
-                <h3 className="text-sm font-semibold text-white/80">Bus Factor / Yazar Riski</h3>
+                <h3 className="text-sm font-semibold text-zinc-900/80 dark:text-white/80">Bus Factor / Yazar Riski</h3>
             </div>
 
             {loading && (
                 <div className="space-y-4 animate-pulse">
-                    <div className="h-4 bg-white/5 rounded w-1/3" />
-                    <div className="h-8 bg-white/5 rounded-full w-full" />
+                    <div className="h-4 bg-zinc-900/5 dark:bg-white/5 rounded w-1/3" />
+                    <div className="h-8 bg-zinc-900/5 dark:bg-white/5 rounded-full w-full" />
                     <div className="flex gap-2">
-                        <div className="w-8 h-8 rounded-full bg-white/5" />
-                        <div className="w-8 h-8 rounded-full bg-white/5" />
+                        <div className="w-8 h-8 rounded-full bg-zinc-900/5 dark:bg-white/5" />
+                        <div className="w-8 h-8 rounded-full bg-zinc-900/5 dark:bg-white/5" />
                     </div>
                 </div>
             )}
@@ -86,17 +86,17 @@ export function BusFactorCard({ meta }: BusFactorCardProps) {
 
                         <div>
                             <p className="text-sm font-semibold" style={{ color: result.color }}>{result.risk}</p>
-                            <p className="text-xs text-white/60 mt-0.5 leading-relaxed">{result.advice}</p>
+                            <p className="text-xs text-zinc-900/60 dark:text-white/60 mt-0.5 leading-relaxed">{result.advice}</p>
                         </div>
                     </div>
 
                     {/* Cumulative Share Bar */}
                     <div className="space-y-2">
-                        <div className="flex items-center justify-between text-xs text-white/40">
+                        <div className="flex items-center justify-between text-xs text-zinc-900/40 dark:text-white/40">
                             <span>En Çok Katkı Sağlayanlar</span>
                             <span>{result.totalCommitsTop10} commit (Top 10)</span>
                         </div>
-                        <div className="h-4 w-full bg-white/5 rounded-full overflow-hidden flex">
+                        <div className="h-4 w-full bg-zinc-900/5 dark:bg-white/5 rounded-full overflow-hidden flex">
                             {result.topContributors.map((c, i) => {
                                 const width = Math.max(2, (c.contributions / result.totalCommitsTop10) * 100);
                                 const lightness = 60 - i * 4;
@@ -126,9 +126,9 @@ export function BusFactorCard({ meta }: BusFactorCardProps) {
                                 <img
                                     src={c.avatar_url}
                                     alt={c.login}
-                                    className="w-8 h-8 rounded-full border border-white/10 group-hover:border-indigo-400 transition-colors"
+                                    className="w-8 h-8 rounded-full border border-zinc-900/10 dark:border-white/10 group-hover:border-indigo-400 transition-colors"
                                 />
-                                <div className="absolute -bottom-1 -right-1 bg-[#0f0f1a] border border-white/10 text-[9px] px-1 rounded-full text-white/60">
+                                <div className="absolute -bottom-1 -right-1 bg-[#0f0f1a] border border-zinc-900/10 dark:border-white/10 text-[9px] px-1 rounded-full text-zinc-900/60 dark:text-white/60">
                                     {Math.round((c.contributions / result.totalCommitsTop10) * 100)}%
                                 </div>
                             </a>
@@ -138,7 +138,7 @@ export function BusFactorCard({ meta }: BusFactorCardProps) {
             )}
 
             {result && result.topContributors.length === 0 && (
-                <div className="text-xs text-white/30 text-center py-4">Katkıda bulunan verisi mevcut değil.</div>
+                <div className="text-xs text-zinc-900/30 dark:text-white/30 text-center py-4">Katkıda bulunan verisi mevcut değil.</div>
             )}
         </div>
     );

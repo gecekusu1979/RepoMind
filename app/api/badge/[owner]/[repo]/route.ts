@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
-import { fetchRepoMeta, fetchFileTree, fetchCriticalFiles, isValidGitHubSlug } from "@/lib/github";
+import { fetchRepoMeta, fetchFileTree, fetchCriticalFiles, isValidSlug } from "@/lib/gitProvider";
 import { analyzeRepo } from "@/lib/analyzer";
+import { runDevopsLinter } from "@/lib/devopsLinter";
 import { checkRateLimit, rateLimitHeaders } from "@/lib/rateLimit";
 
 export const runtime = "edge";
@@ -66,7 +67,7 @@ export async function GET(
 
     const { owner, repo } = await params;
 
-    if (!isValidGitHubSlug(owner) || !isValidGitHubSlug(repo)) {
+    if (!isValidSlug(owner) || !isValidSlug(repo)) {
         const errorSvg = buildSvg("RepoMind", "geçersiz", "#6b7280");
         return new Response(errorSvg, { headers: { "Content-Type": "image/svg+xml", "Cache-Control": "no-cache" } });
     }
@@ -77,10 +78,14 @@ export async function GET(
     const metric = ALLOWED_METRICS.has(rawMetric) ? rawMetric : "health";
 
     try {
-        const meta = await fetchRepoMeta(owner, repo);
-        const { items, truncated } = await fetchFileTree(owner, repo, meta.defaultBranch);
-        const { readme, packageJson } = await fetchCriticalFiles(owner, repo, meta.defaultBranch, items);
-        const analysis = analyzeRepo(items, readme, packageJson, truncated);
+        const parsed = { provider: 'github' as const, owner, repo };
+        const meta = await fetchRepoMeta(parsed);
+        const { items, truncated } = await fetchFileTree(parsed, meta.defaultBranch);
+        const [{ readme, packageJson }, devopsAudit] = await Promise.all([
+            fetchCriticalFiles(parsed, meta.defaultBranch, items),
+            runDevopsLinter(parsed, meta.defaultBranch, items),
+        ]);
+        const analysis = analyzeRepo(items, readme, packageJson, truncated, meta);
 
         const METRIC_MAP: Record<string, { label: string; score: number }> = {
             health: { label: "RepoMind Sağlık", score: analysis.metrics.healthScore },

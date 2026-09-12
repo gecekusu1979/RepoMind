@@ -32,15 +32,15 @@ export function RepoInput({ onAnalyze, isLoading }: RepoInputProps) {
         <div className="w-full space-y-4">
             <div className="relative group">
                 <div className="absolute inset-0 bg-gradient-to-r from-violet-600/20 via-blue-600/20 to-cyan-600/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="relative flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-4 py-3 backdrop-blur-sm hover:border-white/20 transition-colors">
-                    <GitBranch className="w-5 h-5 text-white/40 flex-shrink-0" />
+                <div className="relative flex items-center gap-3 bg-zinc-900/5 dark:bg-white/5 border border-zinc-900/10 dark:border-white/10 rounded-2xl px-4 py-3 backdrop-blur-sm hover:border-zinc-900/20 dark:border-white/20 transition-colors">
+                    <GitBranch className="w-5 h-5 text-zinc-900/40 dark:text-white/40 flex-shrink-0" />
                     <input
                         type="text"
                         value={value}
                         onChange={(e) => setValue(e.target.value)}
                         onKeyDown={handleKey}
                         placeholder="https://github.com/owner/repo or owner/repo"
-                        className="flex-1 bg-transparent text-white placeholder:text-white/30 outline-none text-sm md:text-base font-mono"
+                        className="flex-1 bg-transparent text-zinc-900 dark:text-white placeholder:text-zinc-900/30 dark:text-white/30 outline-none text-sm md:text-base font-mono"
                         disabled={isLoading}
                         spellCheck={false}
                         autoComplete="off"
@@ -49,11 +49,11 @@ export function RepoInput({ onAnalyze, isLoading }: RepoInputProps) {
                     <button
                         onClick={handleSubmit}
                         disabled={isLoading || !value.trim()}
-                        className="flex items-center gap-2 bg-gradient-to-r from-violet-500 to-blue-500 hover:from-violet-400 hover:to-blue-400 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all duration-200 flex-shrink-0 shadow-lg shadow-violet-500/25"
+                        className="flex items-center gap-2 bg-gradient-to-r from-violet-500 to-blue-500 hover:from-violet-400 hover:to-blue-400 disabled:opacity-40 disabled:cursor-not-allowed text-zinc-900 dark:text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all duration-200 flex-shrink-0 shadow-lg shadow-violet-500/25"
                     >
                         {isLoading ? (
                             <>
-                                <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                                <div className="w-4 h-4 border-2 border-zinc-900/40 dark:border-white/40 border-t-white rounded-full animate-spin" />
                                 <span className="hidden sm:inline">Analyzing…</span>
                             </>
                         ) : (
@@ -69,7 +69,7 @@ export function RepoInput({ onAnalyze, isLoading }: RepoInputProps) {
 
             {/* Demo Pills */}
             <div className="flex items-center gap-2 flex-wrap">
-                <div className="flex items-center gap-1.5 text-white/30 text-xs">
+                <div className="flex items-center gap-1.5 text-zinc-900/30 dark:text-white/30 text-xs">
                     <Sparkles className="w-3 h-3" />
                     <span>Try:</span>
                 </div>
@@ -81,7 +81,7 @@ export function RepoInput({ onAnalyze, isLoading }: RepoInputProps) {
                             onAnalyze(demo.url);
                         }}
                         disabled={isLoading}
-                        className="px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/50 hover:text-white/80 text-xs rounded-full font-mono transition-all duration-200 disabled:cursor-not-allowed"
+                        className="px-3 py-1 bg-zinc-900/5 dark:bg-white/5 hover:bg-zinc-900/10 dark:bg-white/10 border border-zinc-900/10 dark:border-white/10 hover:border-zinc-900/20 dark:border-white/20 text-zinc-900/50 dark:text-white/50 hover:text-zinc-900/80 dark:text-white/80 text-xs rounded-full font-mono transition-all duration-200 disabled:cursor-not-allowed"
                     >
                         {demo.label}
                     </button>

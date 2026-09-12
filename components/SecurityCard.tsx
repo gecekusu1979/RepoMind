@@ -23,7 +23,7 @@ export function SecurityCard({ security }: SecurityCardProps) {
         <div className={`rounded-2xl border ${cfg.bg} ${cfg.border} overflow-hidden`}>
             <button
                 onClick={() => setOpen(!open)}
-                className="w-full flex items-center justify-between gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left"
+                className="w-full flex items-center justify-between gap-3 px-4 py-3 hover:bg-zinc-900/5 dark:bg-white/5 transition-colors text-left"
             >
                 <div className="flex items-center gap-3">
                     <Icon className="w-5 h-5 flex-shrink-0" style={{ color: cfg.color }} />
@@ -31,7 +31,7 @@ export function SecurityCard({ security }: SecurityCardProps) {
                         <div className={`font-semibold text-sm ${cfg.text}`}>
                             Güvenlik Taraması — {cfg.label}
                         </div>
-                        <div className="text-xs text-white/30 mt-0.5">
+                        <div className="text-xs text-zinc-900/30 dark:text-white/30 mt-0.5">
                             {security.findings.length === 0
                                 ? "Hiçbir riskli dosya tespit edilmedi"
                                 : `${security.findings.length} bulgu tespit edildi`}
@@ -40,15 +40,15 @@ export function SecurityCard({ security }: SecurityCardProps) {
                 </div>
                 {security.findings.length > 0 &&
                     (open ? (
-                        <ChevronUp className="w-4 h-4 text-white/30" />
+                        <ChevronUp className="w-4 h-4 text-zinc-900/30 dark:text-white/30" />
                     ) : (
-                        <ChevronDown className="w-4 h-4 text-white/30" />
+                        <ChevronDown className="w-4 h-4 text-zinc-900/30 dark:text-white/30" />
                     ))}
             </button>
 
             {open && security.findings.length > 0 && (
                 <div className="px-4 pb-4 space-y-3">
-                    <div className="h-px bg-white/5" />
+                    <div className="h-px bg-zinc-900/5 dark:bg-white/5" />
                     {security.findings.map((f, i) => (
                         <div
                             key={i}
@@ -62,12 +62,12 @@ export function SecurityCard({ security }: SecurityCardProps) {
                                     {f.severity === "critical" ? "🔴" : "🟡"}
                                 </span>
                                 <div className="min-w-0">
-                                    <p className="font-mono text-xs font-semibold text-white/80 truncate">
+                                    <p className="font-mono text-xs font-semibold text-zinc-900/80 dark:text-white/80 truncate">
                                         {f.path}
                                     </p>
-                                    <p className="text-xs text-white/50 mt-0.5">{f.reason}</p>
-                                    <p className="text-xs text-white/35 mt-1 leading-relaxed">
-                                        <span className="text-white/50 font-medium">Öneri:</span> {f.recommendation}
+                                    <p className="text-xs text-zinc-900/50 dark:text-white/50 mt-0.5">{f.reason}</p>
+                                    <p className="text-xs text-zinc-900/35 dark:text-white/35 mt-1 leading-relaxed">
+                                        <span className="text-zinc-900/50 dark:text-white/50 font-medium">Öneri:</span> {f.recommendation}
                                     </p>
                                 </div>
                             </div>

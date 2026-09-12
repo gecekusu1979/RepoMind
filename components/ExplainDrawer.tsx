@@ -66,17 +66,17 @@ export function ExplainDrawer({ data }: ExplainDrawerProps) {
             {/* Toggle Button */}
             <button
                 onClick={handleToggle}
-                className="w-full flex items-center justify-between gap-3 p-4 hover:bg-white/5 transition-colors text-left"
+                className="w-full flex items-center justify-between gap-3 p-4 hover:bg-zinc-900/5 dark:bg-white/5 transition-colors text-left"
             >
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center shadow-lg shadow-violet-500/25">
-                        <Sparkles className="w-4 h-4 text-white" />
+                        <Sparkles className="w-4 h-4 text-zinc-900 dark:text-white" />
                     </div>
                     <div>
-                        <div className="font-semibold text-white text-sm">
+                        <div className="font-semibold text-zinc-900 dark:text-white text-sm">
                             Explain this Repository
                         </div>
-                        <div className="text-xs text-white/40">
+                        <div className="text-xs text-zinc-900/40 dark:text-white/40">
                             AI-powered breakdown by Gemini Flash
                         </div>
                     </div>
@@ -84,9 +84,9 @@ export function ExplainDrawer({ data }: ExplainDrawerProps) {
                 <div className="flex items-center gap-2">
                     {loading && <Loader2 className="w-4 h-4 text-violet-400 animate-spin" />}
                     {open ? (
-                        <ChevronUp className="w-4 h-4 text-white/30" />
+                        <ChevronUp className="w-4 h-4 text-zinc-900/30 dark:text-white/30" />
                     ) : (
-                        <ChevronDown className="w-4 h-4 text-white/30" />
+                        <ChevronDown className="w-4 h-4 text-zinc-900/30 dark:text-white/30" />
                     )}
                 </div>
             </button>
@@ -94,7 +94,7 @@ export function ExplainDrawer({ data }: ExplainDrawerProps) {
             {/* Content */}
             {open && (
                 <div className="px-4 pb-5 pt-1">
-                    <div className="h-px bg-white/5 mb-4" />
+                    <div className="h-px bg-zinc-900/5 dark:bg-white/5 mb-4" />
 
                     {error && (
                         <div className="text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-xl p-3">
@@ -103,7 +103,7 @@ export function ExplainDrawer({ data }: ExplainDrawerProps) {
                     )}
 
                     {!error && (text || loading) && (
-                        <div className="prose prose-invert prose-sm max-w-none prose-headings:text-white prose-headings:font-semibold prose-p:text-white/70 prose-p:leading-relaxed prose-li:text-white/70 prose-strong:text-white prose-code:text-violet-300 prose-code:bg-white/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-pre:bg-white/5 prose-pre:border prose-pre:border-white/10">
+                        <div className="prose prose-invert prose-sm max-w-none prose-headings:text-zinc-900 dark:text-white prose-headings:font-semibold prose-p:text-zinc-900/70 dark:text-white/70 prose-p:leading-relaxed prose-li:text-zinc-900/70 dark:text-white/70 prose-strong:text-zinc-900 dark:text-white prose-code:text-violet-300 prose-code:bg-zinc-900/5 dark:bg-white/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-pre:bg-zinc-900/5 dark:bg-white/5 prose-pre:border prose-pre:border-zinc-900/10 dark:border-white/10">
                             <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>{text}</ReactMarkdown>
                             {loading && (
                                 <span className="inline-block w-2 h-4 bg-violet-400 animate-pulse rounded ml-0.5 align-middle" />
@@ -112,7 +112,7 @@ export function ExplainDrawer({ data }: ExplainDrawerProps) {
                     )}
 
                     {loading && !text && (
-                        <div className="flex items-center gap-3 text-white/40 text-sm py-4">
+                        <div className="flex items-center gap-3 text-zinc-900/40 dark:text-white/40 text-sm py-4">
                             <Loader2 className="w-5 h-5 animate-spin text-violet-400" />
                             <span>Gemini is analyzing the repository…</span>
                         </div>

@@ -23,7 +23,7 @@ export function PackageAuditCard({ audit }: PackageAuditCardProps) {
         <div className={`rounded-2xl border overflow-hidden ${hasFindings ? 'bg-amber-500/5 border-amber-500/20' : 'bg-emerald-500/5 border-emerald-500/20'}`}>
             <button
                 onClick={() => setOpen(!open)}
-                className="w-full flex items-center justify-between gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left"
+                className="w-full flex items-center justify-between gap-3 px-4 py-3 hover:bg-zinc-900/5 dark:bg-white/5 transition-colors text-left"
                 disabled={!hasFindings}
             >
                 <div className="flex items-center gap-3">
@@ -36,7 +36,7 @@ export function PackageAuditCard({ audit }: PackageAuditCardProps) {
                         <div className={`font-semibold text-sm ${hasFindings ? 'text-amber-400' : 'text-emerald-400'}`}>
                             Bağımlılık & Script Denetimi
                         </div>
-                        <div className="text-xs text-white/30 mt-0.5">
+                        <div className="text-xs text-zinc-900/30 dark:text-white/30 mt-0.5">
                             {hasFindings
                                 ? `${audit.findings.length} risk tespit edildi`
                                 : "Tehlikeli paket, script veya viral lisans bulunmadı"}
@@ -47,17 +47,17 @@ export function PackageAuditCard({ audit }: PackageAuditCardProps) {
 
             {open && hasFindings && (
                 <div className="px-4 pb-4 space-y-4">
-                    <div className="h-px bg-white/5" />
+                    <div className="h-px bg-zinc-900/5 dark:bg-white/5" />
 
                     {depr.length > 0 && (
                         <div className="space-y-2">
-                            <div className="flex items-center gap-1.5 text-xs font-semibold text-white/50 uppercase">
+                            <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-900/50 dark:text-white/50 uppercase">
                                 <Package className="w-3.5 h-3.5" /> Deprecated / Legacy Paketler
                             </div>
                             {depr.map((f, i) => (
-                                <div key={i} className="bg-white/5 rounded-xl border border-white/10 p-3 space-y-1.5">
-                                    <p className="font-mono text-xs font-semibold text-white/90">{f.name}</p>
-                                    <p className="text-xs text-white/50">{f.reason}</p>
+                                <div key={i} className="bg-zinc-900/5 dark:bg-white/5 rounded-xl border border-zinc-900/10 dark:border-white/10 p-3 space-y-1.5">
+                                    <p className="font-mono text-xs font-semibold text-zinc-900/90 dark:text-white/90">{f.name}</p>
+                                    <p className="text-xs text-zinc-900/50 dark:text-white/50">{f.reason}</p>
                                     <p className="text-xs text-indigo-300 font-medium mt-1">Öneri: {f.recommendation}</p>
                                 </div>
                             ))}
@@ -66,13 +66,13 @@ export function PackageAuditCard({ audit }: PackageAuditCardProps) {
 
                     {scripts.length > 0 && (
                         <div className="space-y-2">
-                            <div className="flex items-center gap-1.5 text-xs font-semibold text-white/50 uppercase">
+                            <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-900/50 dark:text-white/50 uppercase">
                                 <Code className="w-3.5 h-3.5" /> Çalıştırılabilir Script Riskleri
                             </div>
                             {scripts.map((f, i) => (
                                 <div key={i} className="bg-red-500/5 rounded-xl border border-red-500/15 p-3 space-y-1.5">
                                     <p className="font-mono text-xs font-semibold text-red-300">{f.name.replace("script:", "")}</p>
-                                    <p className="text-xs text-white/50">{f.reason}</p>
+                                    <p className="text-xs text-zinc-900/50 dark:text-white/50">{f.reason}</p>
                                 </div>
                             ))}
                         </div>
@@ -80,12 +80,12 @@ export function PackageAuditCard({ audit }: PackageAuditCardProps) {
 
                     {license.length > 0 && (
                         <div className="space-y-2">
-                            <div className="flex items-center gap-1.5 text-xs font-semibold text-white/50 uppercase">
+                            <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-900/50 dark:text-white/50 uppercase">
                                 <ShieldAlert className="w-3.5 h-3.5" /> Viral Lisans
                             </div>
                             {license.map((f, i) => (
                                 <div key={i} className="bg-amber-500/10 rounded-xl border border-amber-500/20 p-3 space-y-1.5">
-                                    <p className="text-xs text-white/50">{f.reason}</p>
+                                    <p className="text-xs text-zinc-900/50 dark:text-white/50">{f.reason}</p>
                                     <p className="text-xs text-amber-300 font-medium">Öneri: {f.recommendation}</p>
                                 </div>
                             ))}

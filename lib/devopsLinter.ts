@@ -6,8 +6,8 @@
  */
 
 import { DevOpsFinding, DevOpsAuditResult } from "@/types/repo";
-import { FileTreeItem } from "@/types/repo";
-import { fetchRawFile } from "@/lib/github";
+import { FileTreeItem, ParsedRepoUrl } from "@/types/repo";
+import { fetchRawFile } from "@/lib/gitProvider";
 
 
 function lintDockerfile(content: string, filePath: string): DevOpsFinding[] {
@@ -174,12 +174,13 @@ function lintGitHubActionsFile(content: string, filePath: string): DevOpsFinding
 
 
 export async function runDevopsLinter(
-    owner: string,
-    repo: string,
+    parsed: ParsedRepoUrl,
     branch: string,
     tree: FileTreeItem[]
 ): Promise<DevOpsAuditResult> {
-    const pathSet = tree.map((f) => f.path);
+    const pathSet = tree
+        .filter((f) => !f.path.includes("node_modules/") && !f.path.includes("vendor/") && !f.path.includes("dist/"))
+        .map((f) => f.path);
 
     const dockerfiles = pathSet.filter(
         (p) => /^(.*\/)?dockerfile$/i.test(p) || /^(.*\/)?docker-compose\.ya?ml$/i.test(p)
@@ -197,7 +198,7 @@ export async function runDevopsLinter(
 
     await Promise.all(
         targets.map(async (path) => {
-            const content = await fetchRawFile(owner, repo, path, branch);
+            const content = await fetchRawFile(parsed, path, branch);
             if (!content) return;
 
             const isDocker =

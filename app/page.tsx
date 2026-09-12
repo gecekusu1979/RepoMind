@@ -17,11 +17,14 @@ import { BusFactorCard } from "@/components/BusFactorCard";
 import { GoodFirstIssues } from "@/components/GoodFirstIssues";
 import { PackageAuditCard } from "@/components/PackageAuditCard";
 import { DevOpsHealthCard } from "@/components/DevOpsHealthCard";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { CommitHistoryChart } from "@/components/CommitHistoryChart";
 import { getCached, setCached } from "@/lib/cache";
 import { AlertCircle, GitBranch, Zap, Code2, Shield, BarChart3, GitCompare } from "lucide-react";
 import dynamic from "next/dynamic";
 
 const ArchitectureFlow = dynamic(() => import("@/components/ArchitectureFlow").then(m => m.ArchitectureFlow), { ssr: false });
+const DependencyGraph = dynamic(() => import("@/components/DependencyGraph").then(m => m.DependencyGraph), { ssr: false });
 const WebLLMChat = dynamic(() => import("@/components/WebLLMChat").then(m => m.WebLLMChat), { ssr: false });
 
 type AppState =
@@ -96,7 +99,7 @@ export default function Home() {
   }, [runAnalysis]);
 
   return (
-    <main className="min-h-screen bg-[#070710] text-white selection:bg-violet-500/30">
+    <main className="min-h-screen bg-[#f8fafc] dark:bg-[#070710] text-zinc-900 dark:text-white selection:bg-violet-500/30">
       {/* Ambient background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden>
         <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-violet-600/10 rounded-full blur-3xl" />
@@ -111,19 +114,22 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-violet-500 to-blue-600 flex items-center justify-center shadow-2xl shadow-violet-500/30">
-                <GitBranch className="w-5 h-5 text-white" />
+                <GitBranch className="w-5 h-5 text-zinc-900 dark:text-white" />
               </div>
               <span className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-white/90 to-white/60 bg-clip-text text-transparent">
                 RepoMind
               </span>
             </div>
-            <a
-              href="/vs"
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/50 hover:text-white/80 text-xs rounded-xl transition-all font-medium"
-            >
-              <GitCompare className="w-3.5 h-3.5" />
-              Karşılaştır
-            </a>
+            <div className="flex items-center gap-3">
+              <a
+                href="/vs"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900/5 dark:bg-white/5 hover:bg-zinc-900/10 dark:hover:bg-white/10 border border-zinc-900/10 dark:border-white/10 text-zinc-900/50 dark:text-white/50 hover:text-zinc-900/80 dark:hover:text-white/80 text-xs rounded-xl transition-all font-medium"
+              >
+                <GitCompare className="w-3.5 h-3.5" />
+                Karşılaştır
+              </a>
+              <ThemeToggle />
+            </div>
           </div>
 
           {/* Title */}
@@ -136,7 +142,7 @@ export default function Home() {
               <br className="hidden md:block" />
               saniyeler içinde anlayın
             </h1>
-            <p className="text-white/50 text-base md:text-lg max-w-xl leading-relaxed">
+            <p className="text-zinc-900/50 dark:text-white/50 text-base md:text-lg max-w-xl leading-relaxed">
               Heuristik analiz + AI açıklamaları. Klonlama yok. Sadece GitHub URL&apos;si.
             </p>
 
@@ -205,7 +211,7 @@ export default function Home() {
         {state.status === "success" && (
           <section className="pb-16 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Header Card */}
-            <div className="p-5 md:p-6 bg-white/[0.03] border border-white/10 rounded-2xl">
+            <div className="p-5 md:p-6 bg-zinc-900/[0.03] dark:bg-white/[0.03] border border-zinc-900/10 dark:border-white/10 rounded-2xl">
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div className="flex-1 min-w-0">
                   <RepoHeader
@@ -224,7 +230,7 @@ export default function Home() {
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-4">
               {/* Left: Architecture + Language + Treemap + Dependencies */}
               <div className="space-y-4">
-                <div className="p-5 bg-white/[0.03] border border-white/10 rounded-2xl">
+                <div className="p-5 bg-zinc-900/[0.03] dark:bg-white/[0.03] border border-zinc-900/10 dark:border-white/10 rounded-2xl">
                   <ArchitectureTree buckets={state.data.analysis.architecture} />
                 </div>
 
@@ -236,13 +242,13 @@ export default function Home() {
                 />
 
                 {state.data.analysis.topLanguages.length > 0 && (
-                  <div className="p-5 bg-white/[0.03] border border-white/10 rounded-2xl">
+                  <div className="p-5 bg-zinc-900/[0.03] dark:bg-white/[0.03] border border-zinc-900/10 dark:border-white/10 rounded-2xl">
                     <LanguageBar languages={state.data.analysis.topLanguages} />
                   </div>
                 )}
 
                 {/* Feature 4: Cross-filter enabled Treemap */}
-                <div className="p-5 bg-white/[0.03] border border-white/10 rounded-2xl">
+                <div className="p-5 bg-zinc-900/[0.03] dark:bg-white/[0.03] border border-zinc-900/10 dark:border-white/10 rounded-2xl">
                   <TreemapVisualizer
                     files={state.data.analysis.architecture.flatMap((b) =>
                       b.paths.map((p) => ({
@@ -262,34 +268,16 @@ export default function Home() {
                   <DevOpsHealthCard audit={state.data.analysis.devopsAudit} />
                 )}
 
-                {/* Dependencies */}
-                {state.data.analysis.dependencies.length > 0 && (
-                  <div className="p-5 bg-white/[0.03] border border-white/10 rounded-2xl">
-                    <h3 className="text-xs font-semibold text-white/30 uppercase tracking-widest mb-3">
-                      Bağımlılıklar ({state.data.analysis.dependencies.length})
-                    </h3>
-                    <div className="flex flex-wrap gap-1.5">
-                      {state.data.analysis.dependencies.slice(0, 30).map((dep) => (
-                        <span
-                          key={dep}
-                          className="px-2 py-0.5 bg-white/5 border border-white/10 rounded-md text-xs font-mono text-white/50"
-                        >
-                          {dep}
-                        </span>
-                      ))}
-                      {state.data.analysis.dependencies.length > 30 && (
-                        <span className="px-2 py-0.5 text-xs text-white/30">
-                          +{state.data.analysis.dependencies.length - 30} daha
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                )}
+                {/* Dependencies Graph */}
+                <DependencyGraph
+                  dependencies={state.data.analysis.dependencies}
+                  devDependencies={state.data.analysis.devDependencies}
+                />
               </div>
 
               {/* Right: Scores + Security */}
               <div className="space-y-4 lg:sticky lg:top-6 self-start lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto no-scrollbar pb-8">
-                <div className="p-5 bg-white/[0.03] border border-white/10 rounded-2xl h-fit">
+                <div className="p-5 bg-zinc-900/[0.03] dark:bg-white/[0.03] border border-zinc-900/10 dark:border-white/10 rounded-2xl h-fit">
                   <ScorePanel
                     testScore={state.data.analysis.metrics.testScore}
                     docScore={state.data.analysis.metrics.docScore}
@@ -298,15 +286,17 @@ export default function Home() {
                   />
                 </div>
 
-                {/* Security scan card */}
                 <div className="space-y-4 pt-1">
+                  {state.data.analysis.commitActivity && state.data.analysis.commitActivity.length > 0 && (
+                    <CommitHistoryChart data={state.data.analysis.commitActivity} />
+                  )}
                   <PackageAuditCard audit={state.data.analysis.packageAudit} />
                   <SecurityCard security={state.data.analysis.security} />
                 </div>
 
                 {/* Badge URL card */}
-                <div className="p-4 bg-white/[0.03] border border-white/10 rounded-2xl space-y-2">
-                  <h3 className="text-xs font-semibold text-white/30 uppercase tracking-widest">
+                <div className="p-4 bg-zinc-900/[0.03] dark:bg-white/[0.03] border border-zinc-900/10 dark:border-white/10 rounded-2xl space-y-2">
+                  <h3 className="text-xs font-semibold text-zinc-900/30 dark:text-white/30 uppercase tracking-widest">
                     Rozet URL&apos;leri
                   </h3>
                   <div className="space-y-1.5">
@@ -320,7 +310,7 @@ export default function Home() {
                           rel="noopener noreferrer"
                           className="flex items-center gap-2 group"
                         >
-                          <code className="text-[10px] font-mono text-white/30 group-hover:text-white/60 bg-white/5 px-2 py-1 rounded-lg truncate w-full transition-colors">
+                          <code className="text-[10px] font-mono text-zinc-900/30 dark:text-white/30 group-hover:text-zinc-900/60 dark:text-white/60 bg-zinc-900/5 dark:bg-white/5 px-2 py-1 rounded-lg truncate w-full transition-colors">
                             /api/badge/{state.data.meta.owner}/{state.data.meta.name}?metric={metric}
                           </code>
                         </a>
@@ -338,7 +328,7 @@ export default function Home() {
             </div>
 
             {/* Badges */}
-            <div className="p-5 md:p-6 bg-white/[0.03] border border-white/10 rounded-2xl">
+            <div className="p-5 md:p-6 bg-zinc-900/[0.03] dark:bg-white/[0.03] border border-zinc-900/10 dark:border-white/10 rounded-2xl">
               <BadgeList
                 goodPractices={state.data.analysis.goodPractices}
                 potentialProblems={state.data.analysis.potentialProblems}
@@ -353,13 +343,13 @@ export default function Home() {
 
         {/* Footer */}
         {state.status === "idle" && (
-          <footer className="pb-16 text-center text-white/20 text-xs space-y-3">
+          <footer className="pb-16 text-center text-zinc-900/20 dark:text-white/20 text-xs space-y-3">
             <p className="flex items-center justify-center gap-1.5 opacity-60">
               RepoMind Chrome Eklentisini yükleyerek GitHub üzerinde tek tıkla analiz başlatabilirsiniz.
             </p>
             <p>Klonlama yok. Sadece GitHub API + heuristik motor.</p>
             <p>
-              <code className="font-mono bg-white/5 px-1.5 py-0.5 rounded">GITHUB_TOKEN</code>{" "}
+              <code className="font-mono bg-zinc-900/5 dark:bg-white/5 px-1.5 py-0.5 rounded">GITHUB_TOKEN</code>{" "}
               opsiyonel — 60 → 5,000 istek/saat.
             </p>
           </footer>
@@ -371,7 +361,7 @@ export default function Home() {
 
 function FeaturePill({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (
-    <div className="flex items-center gap-1.5 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs text-white/50">
+    <div className="flex items-center gap-1.5 px-3 py-1 bg-zinc-900/5 dark:bg-white/5 border border-zinc-900/10 dark:border-white/10 rounded-full text-xs text-zinc-900/50 dark:text-white/50">
       {icon}
       <span>{label}</span>
     </div>
@@ -381,7 +371,7 @@ function FeaturePill({ icon, label }: { icon: React.ReactNode; label: string }) 
 function SkeletonBlock({ className }: { className?: string }) {
   return (
     <div
-      className={`bg-white/[0.03] border border-white/5 animate-pulse ${className}`}
+      className={`bg-zinc-900/[0.03] dark:bg-white/[0.03] border border-zinc-900/5 dark:border-white/5 animate-pulse ${className}`}
     />
   );
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isValidGitHubSlug } from "@/lib/github";
+import { isValidSlug } from "@/lib/gitProvider";
 import { classifyPulse } from "@/lib/repoPulse";
 import { checkRateLimit, rateLimitHeaders } from "@/lib/rateLimit";
 
@@ -19,7 +19,7 @@ export async function GET(
 
     const { owner, repo } = await params;
 
-    if (!isValidGitHubSlug(owner) || !isValidGitHubSlug(repo)) {
+    if (!isValidSlug(owner) || !isValidSlug(repo)) {
         return NextResponse.json({ error: "Geçersiz depo adı." }, { status: 400 });
     }
 

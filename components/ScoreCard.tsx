@@ -44,8 +44,8 @@ function RadialScore({ score, color }: { score: number; color: string }) {
             </svg>
             {/* Score text */}
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-xl font-bold text-white">{score}</span>
-                <span className="text-xs text-white/40 font-medium">/ 100</span>
+                <span className="text-xl font-bold text-zinc-900 dark:text-white">{score}</span>
+                <span className="text-xs text-zinc-900/40 dark:text-white/40 font-medium">/ 100</span>
             </div>
         </div>
     );
@@ -64,7 +64,7 @@ export function ScoreCard({ label, score, icon, description, color }: ScoreCardP
 
     return (
         <div
-            className="relative flex items-center gap-4 p-4 rounded-2xl border bg-white/[0.03] overflow-hidden group hover:bg-white/[0.05] transition-colors"
+            className="relative flex items-center gap-4 p-4 rounded-2xl border bg-zinc-900/[0.03] dark:bg-white/[0.03] overflow-hidden group hover:bg-zinc-900/[0.05] dark:bg-white/[0.05] transition-colors"
             style={{ borderColor: color + "20" }}
         >
             {/* Glow BG */}
@@ -78,9 +78,9 @@ export function ScoreCard({ label, score, icon, description, color }: ScoreCardP
             <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                     <span className="text-lg">{icon}</span>
-                    <h4 className="font-semibold text-white text-sm">{label}</h4>
+                    <h4 className="font-semibold text-zinc-900 dark:text-white text-sm">{label}</h4>
                 </div>
-                <p className="text-xs text-white/40 leading-relaxed mb-2">{description}</p>
+                <p className="text-xs text-zinc-900/40 dark:text-white/40 leading-relaxed mb-2">{description}</p>
                 <span
                     className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold"
                     style={{ backgroundColor: rating.color + "20", color: rating.color }}
@@ -103,11 +103,11 @@ export function ScorePanel({ testScore, docScore, healthScore, overall }: ScoreP
     return (
         <div className="space-y-3">
             <div className="flex items-center justify-between">
-                <h3 className="text-xs font-semibold text-white/30 uppercase tracking-widest">
+                <h3 className="text-xs font-semibold text-zinc-900/30 dark:text-white/30 uppercase tracking-widest">
                     Quality Metrics
                 </h3>
                 <div className="flex items-center gap-1.5">
-                    <span className="text-xs text-white/30">Overall</span>
+                    <span className="text-xs text-zinc-900/30 dark:text-white/30">Overall</span>
                     <span
                         className="text-sm font-bold px-2 py-0.5 rounded-full"
                         style={{

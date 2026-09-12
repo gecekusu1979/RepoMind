@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { processIssues } from "@/lib/issues";
-import { isValidGitHubSlug } from "@/lib/github";
+import { isValidSlug } from "@/lib/gitProvider";
 import { checkRateLimit, rateLimitHeaders } from "@/lib/rateLimit";
 
 export const runtime = "edge";
@@ -19,7 +19,7 @@ export async function GET(
 
     const { owner, repo } = await params;
 
-    if (!isValidGitHubSlug(owner) || !isValidGitHubSlug(repo)) {
+    if (!isValidSlug(owner) || !isValidSlug(repo)) {
         return NextResponse.json({ error: 'Geçersiz parametre formatı.' }, { status: 400 });
     }
 

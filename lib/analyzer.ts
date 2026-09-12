@@ -6,7 +6,6 @@
 } from "@/types/repo";
 import { runSecurityScan } from "@/lib/securityScanner";
 import { checkActivity } from "@/lib/activityChecker";
-import { auditPackages } from "@/lib/packageAudit";
 
 const EXCLUDE_DIRS = new Set(['node_modules', '.git', '.next', 'dist', 'build', 'vendor', 'target', '.venv', 'out']);
 const CODE_EXTS = new Set(['ts', 'tsx', 'js', 'jsx', 'py', 'go', 'rs', 'java', 'c', 'cpp', 'cs', 'php', 'rb', 'swift', 'kt', 'vue', 'svelte']);
@@ -90,6 +89,8 @@ export function analyzeRepo(
     const topDirs = new Set<string>();
     const firstLevelPaths = new Set<string>();
 
+    let hasCoverage = false;
+
     const archMap: Record<ArchitectureBucket["name"], string[]> = {
         Frontend: [], Backend: [], Database: [], "Infra/DevOps": [], Tests: [], Config: [], Other: []
     };
@@ -139,6 +140,10 @@ export function analyzeRepo(
             isTest = true;
         }
 
+        if (path.startsWith("coverage/") || lowerBase === "lcov.info" || lowerBase === "clover.xml" || lowerBase.includes("cobertura")) {
+            hasCoverage = true;
+        }
+
         if (baseName === ".env" || baseName === ".env.local" || (baseName.startsWith(".env.") && !baseName.includes(".example") && !baseName.includes(".sample"))) {
             problems.push(`🔴 Kritik sır açığı şüphesi: ${path}`);
         }
@@ -183,7 +188,10 @@ export function analyzeRepo(
     }
 
 
-    const testScore = Math.min(100, Math.round((testFilesCount / Math.max(1, codeFilesCount * 0.33)) * 100));
+    let testScore = Math.min(100, Math.round((testFilesCount / Math.max(1, codeFilesCount * 0.33)) * 100));
+    if (hasCoverage) {
+        testScore = Math.min(100, testScore + 20); // Bonus for having a robust setup
+    }
 
     let docScore = 0;
     if (hasReadme) {
@@ -217,6 +225,7 @@ export function analyzeRepo(
 
 
     if (testScore > 50) practices.push("✅ Sağlıklı Test Kapsamı");
+    if (hasCoverage) practices.push("✅ Test Coverage Raporu Bulundu (lcov/clover)");
     if (hasCiCd) practices.push("✅ CI/CD İş Akışı (GitHub Actions vb.)");
     if (hasTypeConfig) practices.push("✅ Statik Tipleme Mevcut");
     if (hasLockfile) practices.push("✅ Deterministik Bağımlılık Ağacı (Lockfile)");
@@ -258,8 +267,6 @@ export function analyzeRepo(
         ? checkActivity(meta.updatedAt, meta.createdAt)
         : checkActivity(new Date().toISOString(), new Date().toISOString());
 
-    const packageAudit = auditPackages(packageJson);
-
     return {
         totalFiles,
         totalSize,
@@ -277,7 +284,7 @@ export function analyzeRepo(
         truncated,
         security,
         activity: activityInfo,
-        packageAudit,
-        devopsAudit: { scanned: false, findings: [] }, // route.ts tarafından override edilir
+        packageAudit: { hasPackageJson: false, findings: [] }, // Set via route.ts
+        devopsAudit: { scanned: false, findings: [] }, // Set via route.ts
     };
 }
