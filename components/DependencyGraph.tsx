@@ -9,6 +9,17 @@ interface DependencyGraphProps {
     devDependencies: string[];
 }
 
+// Analiz edilen deponun package.json'undan gelen bağımlılık adları güvenilir
+// değildir (saldırgan kontrollü olabilir). Mermaid diyagram söz dizimini
+// kırabilecek karakterleri (tırnak, köşeli/süslü parantez, backtick, `|`)
+// temizleyip uzunluğu sınırlıyoruz — XSS/graph-injection'a karşı.
+function sanitizeMermaidLabel(text: string): string {
+    return text
+        .replace(/[`"'<>{}[\]|]/g, "")
+        .replace(/\r?\n/g, " ")
+        .slice(0, 100);
+}
+
 export function DependencyGraph({ dependencies, devDependencies }: DependencyGraphProps) {
     const id = useId().replace(/:/g, "");
     const [svg, setSvg] = useState<string | null>(null);
@@ -37,7 +48,7 @@ export function DependencyGraph({ dependencies, devDependencies }: DependencyGra
                     const visibleDeps = dependencies.slice(0, 15);
                     visibleDeps.forEach((dep, i) => {
                         const safeDep = `dep_${i}`;
-                        code += `  Deps --> ${safeDep}["${dep}"]\n`;
+                        code += `  Deps --> ${safeDep}["${sanitizeMermaidLabel(dep)}"]\n`;
                         code += `  style ${safeDep} fill:#22c55e22,stroke:#22c55e,stroke-width:1px,color:#fff\n`;
                     });
                     if (dependencies.length > 15) {
@@ -51,7 +62,7 @@ export function DependencyGraph({ dependencies, devDependencies }: DependencyGra
                     const visibleDevDeps = devDependencies.slice(0, 15);
                     visibleDevDeps.forEach((dep, i) => {
                         const safeDep = `devdep_${i}`;
-                        code += `  DevDeps --> ${safeDep}["${dep}"]\n`;
+                        code += `  DevDeps --> ${safeDep}["${sanitizeMermaidLabel(dep)}"]\n`;
                         code += `  style ${safeDep} fill:#f59e0b22,stroke:#f59e0b,stroke-width:1px,color:#fff\n`;
                     });
                     if (devDependencies.length > 15) {

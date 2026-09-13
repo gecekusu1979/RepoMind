@@ -27,7 +27,14 @@ export function ArchitectureFlow({ buckets, onLayerSelect, selectedLayer }: Arch
                     startOnLoad: false,
                     theme: "dark",
                     fontFamily: "inherit",
-                    securityLevel: "loose", // Must be loose to allow click handlers
+                    // Not: "loose" GEREKMİYOR — tıklama olayları aşağıdaki ayrı
+                    // useEffect'te doğrudan addEventListener ile bağlanıyor,
+                    // Mermaid'in "click" direktifi kullanılmıyor. "loose" modu
+                    // sadece Mermaid'in SVG çıktısına uyguladığı DOMPurify
+                    // sanitizasyonunu devre dışı bırakır ve node etiketlerine
+                    // (bucket adları burada sabit olsa da, global config paylaşımı
+                    // yüzünden DependencyGraph gibi kullanıcı verisi içeren diğer
+                    // diyagramları da etkiler) XSS riski açardı — kaldırıldı.
                     flowchart: { curve: "basis" }
                 });
 

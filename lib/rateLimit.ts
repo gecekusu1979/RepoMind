@@ -28,8 +28,19 @@ function cleanup(now: number) {
 }
 
 function getClientIp(req: NextRequest): string {
+    // ÖNEMLİ: x-forwarded-for zincirindeki İLK değer istemci tarafından
+    // serbestçe set edilebilir (spoof edilebilir) — buna güvenmek rate
+    // limit'i tamamen anlamsız kılar (her istekte farklı sahte IP
+    // gönderilerek bypass edilir). Tek bir güvenilir reverse proxy'nin
+    // (örn. Vercel edge) arkasında çalışıldığı varsayımıyla, proxy'nin
+    // eklediği SON değeri kullanıyoruz; bu istemci tarafından üzerine
+    // yazılamaz. Birden fazla güvenilir proxy katmanı varsa bu mantığı
+    // proxy sayınıza göre ayarlayın.
     const forwardedFor = req.headers.get("x-forwarded-for");
-    if (forwardedFor) return forwardedFor.split(",")[0].trim();
+    if (forwardedFor) {
+        const parts = forwardedFor.split(",").map((p) => p.trim()).filter(Boolean);
+        if (parts.length > 0) return parts[parts.length - 1];
+    }
     const realIp = req.headers.get("x-real-ip");
     if (realIp) return realIp;
     return "unknown";

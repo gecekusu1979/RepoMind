@@ -1,5 +1,6 @@
-﻿import { NextRequest } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { AnalyzeResponse, ArchitectureBucket } from "@/types/repo";
+import { checkRateLimit, rateLimitHeaders } from "@/lib/rateLimit";
 
 export const runtime = "edge";
 
@@ -327,6 +328,17 @@ function getScoreLabel(score: number): string {
 
 
 export async function POST(req: NextRequest) {
+    // Diğer tüm route'larda olduğu gibi rate limit — daha önce bu endpoint'te
+    // hiç yoktu, kelime-kelime yapay gecikmeli streaming ile birleşince
+    // ucuz bir kaynak tüketimi (DoS) vektörüydü.
+    const rate = checkRateLimit(req, "explain", 20, 60_000);
+    if (!rate.ok) {
+        return NextResponse.json(
+            { error: "Çok fazla istek gönderildi. Lütfen bir süre sonra tekrar deneyin." },
+            { status: 429, headers: rateLimitHeaders(rate) }
+        );
+    }
+
     let data: AnalyzeResponse;
     try {
         const contentType = req.headers.get("content-type") ?? "";
@@ -368,6 +380,7 @@ export async function POST(req: NextRequest) {
             "Transfer-Encoding": "chunked",
             "Cache-Control": "no-cache",
             "X-Report-Engine": "heuristic-deterministic",
+            ...rateLimitHeaders(rate),
         },
     });
 }
