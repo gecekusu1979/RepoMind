@@ -191,12 +191,12 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
     return (
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
             {open && (
-                <div className="w-[360px] md:w-[420px] h-[600px] max-h-[85vh] flex flex-col bg-[#0b0b14] border border-zinc-900/10 dark:border-white/10 rounded-2xl overflow-hidden shadow-2xl mb-4 animate-in slide-in-from-bottom-4 duration-300">
+                <div className="w-[360px] md:w-[420px] h-[600px] max-h-[85vh] flex flex-col bg-white dark:bg-[#0b0b14] border border-zinc-900/10 dark:border-white/10 rounded-2xl overflow-hidden shadow-2xl mb-4 animate-in slide-in-from-bottom-4 duration-300">
                     {/* Header */}
                     <div className="flex items-center justify-between p-4 bg-zinc-900/5 dark:bg-white/5 border-b border-zinc-900/10 dark:border-white/10">
                         <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
-                                <Bot className="w-4 h-4 text-zinc-900 dark:text-white" />
+                                <Bot className="w-4 h-4 text-white" />
                             </div>
                             <div>
                                 <h3 className="text-sm font-semibold text-zinc-900/90 dark:text-white/90">WebLLM Asistanı</h3>
@@ -263,9 +263,9 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
                         {engine && messages.filter(m => m.role !== "system").map((m, i) => (
                             <div key={i} className={`flex items-start gap-2.5 max-w-[90%] ${m.role === "user" ? "ml-auto flex-row-reverse" : ""}`}>
                                 <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${m.role === "user" ? "bg-zinc-900/10 dark:bg-white/10" : "bg-indigo-500"}`}>
-                                    {m.role === "user" ? <User className="w-3.5 h-3.5 text-zinc-900/70 dark:text-white/70" /> : <Bot className="w-3.5 h-3.5 text-zinc-900 dark:text-white" />}
+                                    {m.role === "user" ? <User className="w-3.5 h-3.5 text-zinc-900/70 dark:text-white/70" /> : <Bot className="w-3.5 h-3.5 text-white" />}
                                 </div>
-                                <div className={`p-3 text-[13px] leading-relaxed rounded-2xl ${m.role === "user" ? "bg-zinc-900/10 dark:bg-white/10 text-zinc-900/90 dark:text-white/90 rounded-tr-sm" : "bg-[#1a1a24] border border-zinc-900/5 dark:border-white/5 text-zinc-900/80 dark:text-white/80 rounded-tl-sm"}`}>
+                                <div className={`p-3 text-[13px] leading-relaxed rounded-2xl ${m.role === "user" ? "bg-zinc-900/10 dark:bg-white/10 text-zinc-900/90 dark:text-white/90 rounded-tr-sm" : "bg-zinc-50 dark:bg-[#1a1a24] border border-zinc-900/10 dark:border-white/5 text-zinc-900/80 dark:text-white/80 rounded-tl-sm shadow-sm dark:shadow-none"}`}>
                                     {m.content}
                                 </div>
                             </div>
@@ -304,7 +304,7 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
                             <button
                                 onClick={() => handleSend()}
                                 disabled={!engine || loading || !input.trim()}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-indigo-500 text-zinc-900 dark:text-white rounded-lg hover:bg-indigo-400 disabled:opacity-30 transition-all"
+                                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-400 disabled:opacity-30 transition-all"
                             >
                                 <Send className="w-3.5 h-3.5" />
                             </button>
@@ -316,7 +316,7 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
             {!open && (
                 <button
                     onClick={handleToggle}
-                    className="flex items-center gap-2 px-5 py-3.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 border border-zinc-900/10 dark:border-white/10 text-zinc-900 dark:text-white font-semibold rounded-full shadow-lg shadow-indigo-500/25 transition-all outline-none focus:ring-2 ring-indigo-400/50"
+                    className="flex items-center gap-2 px-5 py-3.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 border border-zinc-900/10 dark:border-white/10 text-white font-semibold rounded-full shadow-lg shadow-indigo-500/25 transition-all outline-none focus:ring-2 ring-indigo-400/50"
                 >
                     <MessageSquare className="w-5 h-5 flex-shrink-0" />
                     <span>Repo AI Asistanı</span>

@@ -70,7 +70,7 @@ export function ExplainDrawer({ data }: ExplainDrawerProps) {
             >
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center shadow-lg shadow-violet-500/25">
-                        <Sparkles className="w-4 h-4 text-zinc-900 dark:text-white" />
+                        <Sparkles className="w-4 h-4 text-white" />
                     </div>
                     <div>
                         <div className="font-semibold text-zinc-900 dark:text-white text-sm">
@@ -103,7 +103,7 @@ export function ExplainDrawer({ data }: ExplainDrawerProps) {
                     )}
 
                     {!error && (text || loading) && (
-                        <div className="prose prose-invert prose-sm max-w-none prose-headings:text-zinc-900 dark:text-white prose-headings:font-semibold prose-p:text-zinc-900/70 dark:text-white/70 prose-p:leading-relaxed prose-li:text-zinc-900/70 dark:text-white/70 prose-strong:text-zinc-900 dark:text-white prose-code:text-violet-300 prose-code:bg-zinc-900/5 dark:bg-white/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-pre:bg-zinc-900/5 dark:bg-white/5 prose-pre:border prose-pre:border-zinc-900/10 dark:border-white/10">
+                        <div className="prose dark:prose-invert prose-sm max-w-none prose-headings:font-semibold prose-p:leading-relaxed prose-code:text-violet-600 dark:prose-code:text-violet-300 prose-code:bg-zinc-900/5 dark:prose-code:bg-white/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-pre:bg-zinc-900/5 dark:prose-pre:bg-white/5 prose-pre:border prose-pre:border-zinc-900/10 dark:prose-pre:border-white/10">
                             <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>{text}</ReactMarkdown>
                             {loading && (
                                 <span className="inline-block w-2 h-4 bg-violet-400 animate-pulse rounded ml-0.5 align-middle" />
