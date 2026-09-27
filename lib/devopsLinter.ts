@@ -10,7 +10,7 @@ import { FileTreeItem, ParsedRepoUrl } from "@/types/repo";
 import { fetchRawFile } from "@/lib/gitProvider";
 
 
-function lintDockerfile(content: string, filePath: string): DevOpsFinding[] {
+export function lintDockerfile(content: string, filePath: string): DevOpsFinding[] {
     const findings: DevOpsFinding[] = [];
     const lines = content.split("\n");
 
@@ -101,7 +101,7 @@ function lintDockerfile(content: string, filePath: string): DevOpsFinding[] {
 }
 
 
-function lintGitHubActionsFile(content: string, filePath: string): DevOpsFinding[] {
+export function lintGitHubActionsFile(content: string, filePath: string): DevOpsFinding[] {
     const findings: DevOpsFinding[] = [];
     const lines = content.split("\n");
 
@@ -115,7 +115,7 @@ function lintGitHubActionsFile(content: string, filePath: string): DevOpsFinding
 
         if (!line || line.startsWith("#")) return;
 
-        const usesMatch = line.match(/^\s*uses:\s*([^@\s]+)@([^\s]+)/);
+        const usesMatch = line.match(/\buses:\s*([^@\s]+)@([^\s]+)/);
         if (usesMatch) {
             const actionRef = usesMatch[2];
             const isSHA = /^[0-9a-f]{40}$/i.test(actionRef);

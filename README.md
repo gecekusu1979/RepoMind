@@ -5,7 +5,7 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Next.js](https://img.shields.io/badge/Next.js-16_App_Router-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Strict_5.x-blue?logo=typescript)](https://www.typescriptlang.org/)
-[![WebGPU](https://img.shields.io/badge/Local_AI-WebGPU_SmolLM2-emerald)](https://webllm.mlc.ai/)
+[![WebGPU](https://img.shields.io/badge/Local_AI-WebGPU_Llama--3.2--1B-emerald)](https://webllm.mlc.ai/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/gecekusu1979/RepoMind/pulls)
 
 **RepoMind**, herhangi bir açık kaynak GitHub deposunun mimarisini, kod sağlığını, bağımlılık risklerini ve sürdürülebilirliğini **depoyu yerel makinenize klonlamadan** saniyeler içinde analiz eden modern bir geliştirici aracıdır.
@@ -17,7 +17,7 @@ Dışarıdan zorunlu bir LLM veya GitHub API anahtarına ihtiyaç duymaz; analiz
 ## ⚡ Temel Özellikler
 
 * **Klonlamasız $O(N)$ Ağaç Taraması:** `git clone` maliyeti olmadan GitHub Git Trees API (`recursive=1`) üzerinden dosya hiyerarşisini tek bir istekte çözümler.
-* **Tarayıcı İçi Yerel AI (WebGPU):** `@mlc-ai/web-llm` ve `SmolLM2-135M` modeli ile tarayıcı sekmesinde çalışan, sıfır token maliyetli yerel repo asistanı.
+* **Tarayıcı İçi Yerel AI (WebGPU):** `@mlc-ai/web-llm` ve `Llama-3.2-1B-Instruct-q4f16` modeli (~880MB) ile tarayıcı sekmesinde çalışan, sıfır token maliyetli yerel repo asistanı.
 * **Otomatik Mimari Haritalandırma:** Frontend, Backend, Veritabanı ve DevOps katmanlarını dizin yapısından tespit eder ve interaktif **Mermaid v11** akış şemasına döker.
 * **Sağlık & Kalite Skorları:** Test kapsama oranı ($S_{\text{test}}$), dokümantasyon yeterliliği ($S_{\text{doc}}$) ve bakım puanı ($S_{\text{health}}$).
 * **Bus Factor & Sürdürülebilirlik:** En aktif 10 katkıcıyı analiz ederek projenin tek bir geliştiriciye bağımlılık riskini (SPOF) tespit eder.
@@ -33,7 +33,7 @@ Dışarıdan zorunlu bir LLM veya GitHub API anahtarına ihtiyaç duymaz; analiz
 * **Çatı:** [Next.js 16](https://nextjs.org) (App Router, React Server Components)
 * **Dil:** TypeScript (Strict Mode)
 * **Arayüz:** Tailwind CSS, Lucide Icons, Recharts, Mermaid.js
-* **İstemci Yapay Zekası:** [@mlc-ai/web-llm](https://webllm.mlc.ai/) (SmolLM2 quantized via WebGPU)
+* **İstemci Yapay Zekası:** [@mlc-ai/web-llm](https://webllm.mlc.ai/) (Llama-3.2-1B-Instruct q4f16, ~880MB, WebGPU)
 * **Güvenlik:** `rehype-sanitize`, `isValidGitHubSlug` traversal & SSRF korumaları
 
 ---

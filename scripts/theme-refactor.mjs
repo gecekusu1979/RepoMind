@@ -12,16 +12,16 @@ function processFile(filePath) {
         let original = content;
 
         // Colors
-        content = content.replace(/bg-\[\#070710\]/g, "bg-[#f8fafc] dark:bg-[#070710]");
+        content = content.replace(/bg-\[#070710\]/g, "bg-[#f8fafc] dark:bg-[#070710]");
         content = content.replace(/text-white(?!\/)/g, "text-zinc-900 dark:text-white");
         content = content.replace(/text-white\/(\d+|\[\d+\.\d+\])/g, "text-zinc-900/$1 dark:text-white/$1");
         content = content.replace(/border-white\/(\d+|\[\d+\.\d+\])/g, "border-zinc-900/$1 dark:border-white/$1");
         content = content.replace(/bg-white\/(\d+|\[\d+\.\d+\])/g, "bg-zinc-900/$1 dark:bg-white/$1");
 
         // Also fix background of page and vs page
-        content = content.replace(/bg-\[\#060610\]/g, "bg-white dark:bg-[#060610]");
+        content = content.replace(/bg-\[#060610\]/g, "bg-white dark:bg-[#060610]");
         content = content.replace(/bg-zinc-950/g, "bg-white dark:bg-zinc-950");
-        content = content.replace(/bg-\[\#0d0d12\]/g, "bg-slate-50 dark:bg-[#0d0d12]");
+        content = content.replace(/bg-\[#0d0d12\]/g, "bg-slate-50 dark:bg-[#0d0d12]");
 
         if (content !== original) {
             fs.writeFileSync(filePath, content, 'utf-8');

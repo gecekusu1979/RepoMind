@@ -1,3 +1,6 @@
+// Geçici deneme betiği — NPM audit advisory API'sini test etmek için.
+// Üretim kodu değildir; scripts/ klasöründe korunuyor.
+
 const req = async () => {
     try {
         const res = await fetch("https://registry.npmjs.org/-/npm/v1/security/advisories/bulk", {

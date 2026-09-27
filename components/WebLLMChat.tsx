@@ -243,7 +243,7 @@ Lütfen doğal bir dille ve kesin kanıtlarla kullanıcının sorularını yanı
                                 <div>
                                     <p className="text-xs font-semibold text-zinc-900/70 dark:text-white/70">{MODEL_ID}</p>
                                     <p className="text-[10px] text-zinc-900/40 dark:text-white/40 max-w-[200px] mx-auto mt-1">
-                                        Tarayıcınıza yükleniyor. Bu işlem bir defalık yaklaşık 100MB indirecektir.
+                                        Tarayıcınıza yükleniyor. Bu işlem bir defalık yaklaşık 880MB indirecektir (Llama-3.2-1B).
                                     </p>
                                 </div>
                                 <div className="w-48 h-1.5 bg-zinc-900/5 dark:bg-white/5 rounded-full overflow-hidden">

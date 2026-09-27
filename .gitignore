@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# pnpm (npm kullanılıyor — pnpm lockfile'ı yanlışlıkla commit'lenmesin)
+pnpm-lock.yaml
+
+# geçici çıktı dosyaları
+audit_output.txt
+lint_output.txt

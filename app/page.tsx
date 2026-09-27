@@ -291,7 +291,11 @@ export default function Home() {
                     <CommitHistoryChart data={state.data.analysis.commitActivity} />
                   )}
                   <PackageAuditCard audit={state.data.analysis.packageAudit} />
-                  <SecurityCard security={state.data.analysis.security} />
+                  <SecurityCard
+                    security={state.data.analysis.security}
+                    meta={state.data.meta}
+                    architecture={state.data.analysis.architecture}
+                  />
                 </div>
 
                 {/* Badge URL card */}
