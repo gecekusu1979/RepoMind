@@ -3,7 +3,7 @@
 import { SecurityScanResult, RepoMeta, ArchitectureBucket } from "@/types/repo";
 import { Shield, ShieldAlert, ShieldCheck, ChevronDown, ChevronUp, Search, Loader2 } from "lucide-react";
 import { useState } from "react";
-import { ContentFinding, ContentScanResult } from "@/lib/contentScanner"; // Assuming these are exported for types, or we can inline type them
+import { ContentScanResult } from "@/lib/contentScanner"; // Assuming these are exported for types, or we can inline type them
 
 interface SecurityCardProps {
     security: SecurityScanResult;
@@ -56,14 +56,17 @@ export function SecurityCard({ security, meta, architecture }: SecurityCardProps
             }
 
             setScanResult(data);
-        } catch (error: any) {
-            setScanError(error.message);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                setScanError(error.message);
+            } else {
+                setScanError("Bilinmeyen bir hata oluştu");
+            }
         } finally {
             setIsScanning(false);
         }
     };
 
-    const hasContentFindings = scanResult && scanResult.findings.length > 0;
     const hasInitialFindings = security.findings.length > 0;
     const totalFindings = (security.findings?.length || 0) + (scanResult?.findings?.length || 0);
 
@@ -188,10 +191,10 @@ export function SecurityCard({ security, meta, architecture }: SecurityCardProps
                                     <div
                                         key={`content-${i}`}
                                         className={`rounded-xl border p-4 space-y-2 ${f.severity === "critical"
-                                                ? "bg-red-500/5 border-red-500/15"
-                                                : f.severity === "high"
-                                                    ? "bg-orange-500/5 border-orange-500/15"
-                                                    : "bg-amber-500/5 border-amber-500/15"
+                                            ? "bg-red-500/5 border-red-500/15"
+                                            : f.severity === "high"
+                                                ? "bg-orange-500/5 border-orange-500/15"
+                                                : "bg-amber-500/5 border-amber-500/15"
                                             }`}
                                     >
                                         <div className="flex items-start gap-2">
